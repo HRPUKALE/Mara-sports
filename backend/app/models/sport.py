@@ -45,3 +45,4 @@ class SportCategory(Base):
     
     # Relationships
     sport = relationship("Sport", back_populates="categories")
+    registrations = relationship("Registration", back_populates="sport_category")

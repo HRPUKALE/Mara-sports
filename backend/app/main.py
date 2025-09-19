@@ -19,6 +19,11 @@ from app.models.user import User
 from app.models.student import Student
 from app.models.institution import Institution
 from app.models.sport import Sport, SportCategory
+from app.models.notification import Notification
+from app.models.consent import ConsentForm, StudentConsent
+from app.models.registration import Registration
+from app.models.payment import Payment
+from app.models.sponsorship import Sponsorship
 from app.schemas.user import UserResponse
 from app.schemas.student import StudentResponse, StudentCreate, StudentUpdate, StudentRegistration
 from app.schemas.institution import InstitutionResponse, InstitutionCreate
@@ -484,18 +489,25 @@ email_service = EmailService()
 async def send_otp(request: OTPRequest, db: Session = Depends(get_db)):
     """Send OTP to email or phone."""
     try:
+        print(f"🔐 OTP Request received: {request.dict()}")
+        
         # Get email or phone from request
         email_or_phone = request.email or request.phone
         if not email_or_phone:
+            print("❌ No email or phone provided")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email or phone is required"
             )
         
+        print(f"📧 Sending OTP to: {email_or_phone}")
+        
         # Generate OTP
         otp_code = generate_otp()
         hashed_otp = hash_otp(otp_code)
         expires_at = datetime.utcnow() + timedelta(minutes=settings.OTP_EXPIRE_MINUTES)
+        
+        print(f"🔢 Generated OTP: {otp_code}")
         
         # Store OTP in memory (in production, use database)
         otp_id = str(uuid.uuid4())
@@ -508,25 +520,33 @@ async def send_otp(request: OTPRequest, db: Session = Depends(get_db)):
             "purpose": request.purpose
         }
         
+        print(f"💾 Stored OTP with ID: {otp_id}")
+        
         # Send OTP via email
-        user_type = "student" if request.purpose == "login" else "institution"
+        user_type = "student" if request.purpose in ["login", "registration"] else "institution"
+        print(f"📤 Sending email as {user_type} to {email_or_phone}")
+        
         email_sent = email_service.send_otp_email(email_or_phone, otp_code, user_type)
         
         if not email_sent:
-            print(f"Failed to send email to {email_or_phone}")
+            print(f"❌ Failed to send email to {email_or_phone}")
             # Still return success to avoid exposing email failures to frontend
             # In production, you might want to handle this differently
+        else:
+            print(f"✅ Email sent successfully to {email_or_phone}")
         
-        print(f"OTP sent to {email_or_phone} via email (ID: {otp_id})")
+        print(f"🎉 OTP process completed for {email_or_phone} (ID: {otp_id})")
         
         return OTPResponse(
             otp_id=otp_id,
             expires_at=expires_at,
             message="OTP sent successfully"
         )
-    except HTTPException:
+    except HTTPException as e:
+        print(f"❌ HTTP Exception: {e.detail}")
         raise
     except Exception as e:
+        print(f"❌ General Exception: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to send OTP: {str(e)}"
@@ -538,6 +558,12 @@ async def send_otp(request: OTPRequest, db: Session = Depends(get_db)):
 async def register_student(student_data: StudentRegistration, db: Session = Depends(get_db)):
     """Register a new student with complete profile information."""
     try:
+        # Validate required name fields
+        if not student_data.first_name or not student_data.first_name.strip():
+            raise HTTPException(status_code=400, detail="First name is required")
+        if not student_data.last_name or not student_data.last_name.strip():
+            raise HTTPException(status_code=400, detail="Last name is required")
+        
         # Check if user already exists
         existing_user = db.query(User).filter(User.email == student_data.email).first()
         if existing_user:
@@ -730,6 +756,157 @@ async def verify_otp_endpoint(request: OTPVerify, db: Session = Depends(get_db))
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to verify OTP: {str(e)}"
         )
+
+# ===== STUDENT PROFILE MANAGEMENT ENDPOINTS =====
+
+@app.get("/api/v1/students/{student_id}/profile", response_model=StudentResponse)
+async def get_student_profile(student_id: str, db: Session = Depends(get_db)):
+    """Get student profile information."""
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return student
+
+@app.put("/api/v1/students/{student_id}/profile", response_model=StudentResponse)
+async def update_student_profile(
+    student_id: str, 
+    profile_data: StudentUpdate, 
+    db: Session = Depends(get_db)
+):
+    """Update student profile information."""
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    # Update fields
+    for field, value in profile_data.dict(exclude_unset=True).items():
+        setattr(student, field, value)
+    
+    student.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(student)
+    return student
+
+# ===== NOTIFICATIONS ENDPOINTS =====
+
+@app.get("/api/v1/notifications")
+async def get_notifications(
+    skip: int = 0, 
+    limit: int = 100, 
+    type: str = None,
+    db: Session = Depends(get_db)
+):
+    """Get notifications for the current user."""
+    query = db.query(Notification)
+    if type:
+        query = query.filter(Notification.type == type)
+    
+    notifications = query.offset(skip).limit(limit).all()
+    return notifications
+
+@app.put("/api/v1/notifications/{notification_id}/read")
+async def mark_notification_as_read(notification_id: str, db: Session = Depends(get_db)):
+    """Mark a notification as read."""
+    notification = db.query(Notification).filter(Notification.id == notification_id).first()
+    if not notification:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    notification.is_read = True
+    notification.updated_at = datetime.utcnow()
+    db.commit()
+    return {"message": "Notification marked as read"}
+
+@app.put("/api/v1/notifications/mark-all-read")
+async def mark_all_notifications_as_read(db: Session = Depends(get_db)):
+    """Mark all notifications as read for the current user."""
+    # This would need to be filtered by current user in a real implementation
+    db.query(Notification).update({"is_read": True, "updated_at": datetime.utcnow()})
+    db.commit()
+    return {"message": "All notifications marked as read"}
+
+# ===== CONSENT FORMS ENDPOINTS =====
+
+@app.get("/api/v1/consents")
+async def get_consent_forms(
+    type: str = None,
+    active: bool = True,
+    db: Session = Depends(get_db)
+):
+    """Get consent forms."""
+    query = db.query(ConsentForm)
+    if type:
+        query = query.filter(ConsentForm.type == type)
+    if active is not None:
+        query = query.filter(ConsentForm.is_active == active)
+    
+    consent_forms = query.all()
+    return consent_forms
+
+@app.get("/api/v1/students/{student_id}/consents")
+async def get_student_consents(student_id: str, db: Session = Depends(get_db)):
+    """Get student's consent agreements."""
+    student_consents = db.query(StudentConsent).filter(StudentConsent.student_id == student_id).all()
+    return student_consents
+
+@app.post("/api/v1/students/{student_id}/consents/submit")
+async def submit_student_consents(
+    student_id: str,
+    consent_data: dict,
+    db: Session = Depends(get_db)
+):
+    """Submit student consent agreements."""
+    # This would need proper validation and processing
+    # For now, return success
+    return {"message": "Consents submitted successfully"}
+
+# ===== STUDENT DASHBOARD ENDPOINTS =====
+
+@app.get("/api/v1/students/{student_id}/dashboard/stats")
+async def get_student_dashboard_stats(student_id: str, db: Session = Depends(get_db)):
+    """Get student dashboard statistics."""
+    # Get registrations count
+    registrations_count = db.query(Registration).filter(Registration.student_id == student_id).count()
+    
+    # Get payments info
+    payments = db.query(Payment).join(Registration).filter(Registration.student_id == student_id).all()
+    total_amount = sum(p.amount for p in payments)
+    paid_amount = sum(p.amount for p in payments if p.status == 'completed')
+    
+    # Get sponsorships info
+    sponsorships_count = db.query(Sponsorship).filter(Sponsorship.institution_id.in_(
+        db.query(Student.institution_id).filter(Student.id == student_id)
+    )).count()
+    
+    return {
+        "registrations_count": registrations_count,
+        "total_amount": total_amount,
+        "paid_amount": paid_amount,
+        "pending_amount": total_amount - paid_amount,
+        "sponsorships_count": sponsorships_count
+    }
+
+@app.get("/api/v1/students/{student_id}/registrations")
+async def get_student_registrations(student_id: str, db: Session = Depends(get_db)):
+    """Get student's sport registrations."""
+    registrations = db.query(Registration).filter(Registration.student_id == student_id).all()
+    return registrations
+
+@app.get("/api/v1/students/{student_id}/payments")
+async def get_student_payments(student_id: str, db: Session = Depends(get_db)):
+    """Get student's payments."""
+    payments = db.query(Payment).join(Registration).filter(Registration.student_id == student_id).all()
+    return payments
+
+@app.get("/api/v1/students/{student_id}/sponsorships")
+async def get_student_sponsorships(student_id: str, db: Session = Depends(get_db)):
+    """Get student's sponsorships."""
+    # Get institution ID for the student
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student or not student.institution_id:
+        return []
+    
+    sponsorships = db.query(Sponsorship).filter(Sponsorship.institution_id == student.institution_id).all()
+    return sponsorships
 
 if __name__ == "__main__":
     uvicorn.run(

@@ -35,6 +35,7 @@ class User(Base):
     # Relationships
     student_profile = relationship("Student", back_populates="user", uselist=False)
     institution_profile = relationship("Institution", back_populates="user", uselist=False)
+    notifications = relationship("Notification", back_populates="user")
     
     @staticmethod
     def hash_password(password: str) -> str:

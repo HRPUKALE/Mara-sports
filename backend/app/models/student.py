@@ -66,3 +66,5 @@ class Student(Base):
     # Relationships
     user = relationship("User", back_populates="student_profile")
     institution = relationship("Institution", back_populates="students")
+    consents = relationship("StudentConsent", back_populates="student")
+    registrations = relationship("Registration", back_populates="student")

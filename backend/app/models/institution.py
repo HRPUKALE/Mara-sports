@@ -36,3 +36,5 @@ class Institution(Base):
     # Relationships
     user = relationship("User", back_populates="institution_profile")
     students = relationship("Student", back_populates="institution")
+    payments = relationship("Payment", back_populates="institution")
+    sponsorships = relationship("Sponsorship", back_populates="institution")
