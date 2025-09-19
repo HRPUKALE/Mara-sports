@@ -8,6 +8,9 @@ import { SportsSubCategoriesStep } from "@/components/institution-registration/S
 import { ManualStudentAddStep } from "@/components/institution-registration/ManualStudentAddStep";
 import { InstitutionPaymentStep } from "@/components/institution-registration/InstitutionPaymentStep";
 import { InstitutionRegistrationSidebar } from "@/components/registration/InstitutionRegistrationSidebar";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { PanelLeft } from "lucide-react";
 
 export const NewInstitutionRegisterPage = () => {
   const navigate = useNavigate();
@@ -126,13 +129,29 @@ export const NewInstitutionRegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      {/* Mobile steps trigger */}
+      <div className="md:hidden sticky top-0 z-30 bg-background/80 backdrop-blur border-b">
+        <div className="flex items-center justify-between p-3">
+          <div className="text-sm font-medium">Institution Registration</div>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <PanelLeft className="h-4 w-4" /> Steps
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-80 max-w-[85vw]">
+              <InstitutionRegistrationSidebar showOnMobile currentStep={currentStep as number} completedSteps={completedSteps} />
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
       <InstitutionRegistrationSidebar 
         currentStep={currentStep as number} 
         completedSteps={completedSteps} 
       />
       
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
           {currentStep === 1 && (
             <InstitutionDetailsStep

@@ -15,6 +15,305 @@ import { Search, Filter, Eye, Edit, Trash2, Plus, UserPlus, Download, CreditCard
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
 
+// ===== Institution Type Lists =====
+const KAISO_SCHOOLS = [
+  "Aga Khan Academy",
+  "Braeburn Garden Estate - BGE",
+  "Braeburn Gitanga Road - BGR",
+  "Braeside School, Thika",
+  "Braeside School, Lavington",
+  "Brookhouse School, Karen",
+  "Brookhouse School, Runda",
+  "Brookhurst International, Lavington",
+  "Brookhurst International, Kiserian",
+  "Crawford International School",
+  "The Banda School",
+  "French School",
+  "German School",
+  "Jawabu School",
+  "Light International School",
+  "Makini Cambridge School",
+  "Nairobi Academy",
+  "Nairobi Jaffery Academy",
+  "Oshwal Academy U15 & U17",
+  "Oshwal Academy U17 & U19",
+  "Peponi School (overall)",
+  "Peponi School (Girls Sport)",
+  "Peponi School (Boys Sport)",
+  "Rosslyn Academy (overall)",
+  "Kenton College",
+  "Rusinga School",
+  "SABIS International School",
+  "St Austin's Academy",
+  "St. Christopher's School",
+  "Swedish School",
+  "Woodcreek School",
+  "West Nairobi School - WNS",
+  "ISK",
+  "Durham International School - DIS",
+];
+
+const GOVERNMENT_SCHOOLS = [
+  "MBAGATHI ROAD PRIMARY",
+  "NEMBU PRIMARY",
+  "KAWANGWARE PRIMARY",
+  "TOI PRIMARY",
+  "RIRUTA HGM PRIMARY",
+  "DAGORETTI MUSLIM PRIMARY",
+  "KINYANJUI ROAD PRIMARY",
+  "JOSEPH KANGETHE PRIMARY",
+  "JAMHURI PRIMARY",
+  "GATINA PRIMARY",
+  "MUTUINI PRIMARY",
+  "MUKARARA",
+  "DAGORETTI GIRLS REHABILITATION",
+  "WORLD HOPE ACADEMY",
+  "KAGIRA PRIMARY",
+  "KIRIGU PRIMARY",
+  "RUTHIMITU PRIMARY",
+  "WAITHAKA SPECIAL SCHOOL",
+  "DR. MUTHIORA PRIMARY",
+  "GITIBA PRIMARY",
+  "RIRUTA SATELLITE PRIMARY",
+  "KABIRIA PRIMARY SCHOOL",
+  "SHADRACK KIMALEL PRIMARY SCHOOL",
+  "NDURARUA PRIMARY",
+  "UPPER HILL DAY NURSERY",
+  "UMOJA PRIMARY",
+  "RONALD NGALA PRIMARY",
+  "USHIRIKA PRIMARY",
+  "KARIOBANGI SOUTH PRIMARY",
+  "TOM MBOYA PRIMARY",
+  "GITUAMBA PRIMARY",
+  "PETER KIBUKOSYA PRIMARY",
+  "ATHI PRIMARY",
+  "RUAI PRIMARY",
+  "JEHOVAH JIREH PRIMARY",
+  "NGUNDU PRIMARY",
+  "UNITY PRIMARY",
+  "UTAWALA ACADEMY",
+  "KAYOLE I PRIMARY",
+  "TUMAINI PRIMARY",
+  "OUR LADY OF NAZARETH PRIMARY",
+  "MAUA PRIMARY",
+  "VISIONS PRIMARY (MIHANG'O)",
+  "EMBAKASI GARRISON PRIMARY",
+  "MWANGAZA PRIMARY",
+  "EMBAKASI PRIMARY",
+  "THAWABU PRIMARY",
+  "BONDENI PRIMARY",
+  "KOMAROCK PRIMARY",
+  "KIFARU PRIMARY",
+  "EDELVALE PRIMARY",
+  "IMARA PRIMARY",
+  "DOONHOLM PRIMARY",
+  "BUSARA PRIMARY",
+  "A.E.F. REUBEN PRIMARY",
+  "KWA NJENGA PRIMARY",
+  "DANDORA PRIMARY SCHOOL",
+  "SIMBA DAY NURSERY",
+  "MUGUMO DAY NURSERY",
+  "MWANGAZA DAY NURSERY",
+  "UNITY DAY NURSERY",
+  "UMOJA I DAY NURSERY",
+  "ST. DOMINIC'S PRIMARY SCHOOL",
+  "KAYOLE NORTH PRIMARY",
+  "KANGUNDO ROAD PRY",
+  "JAMES GICHURU PRIMARY",
+  "WANGU PRIMARY",
+  "DRUMVALE PRIMARY",
+  "NJIRU PRIMARY",
+  "EASTLEIGH AIRPORT PRIMARY",
+  "MUTHURWA PRIMARY",
+  "UHURU ESTATE PRIMARY",
+  "HESHIMA ROAD PRIMARY",
+  "OUR LADY OF MERCY GIRLS - SHAURI MOYO",
+  "BAHATI UHURU PRIMARY",
+  "KIMATHI PRIMARY",
+  "MORRISON PRIMARY",
+  "DR. LIVINGSTONE PRIMARY",
+  "NAIROBI RIVER PRIMARY",
+  "NEW EASTLEIGH PRIMARY",
+  "ZAWADI PRIMARY",
+  "MOI AIR BASE PRIMARY",
+  "MOI FORCES ACADEMY",
+  "ST. TERESA'S BOYS PRIMARY SCHOOL",
+  "BAHATI DAY NURSERY",
+  "NEW PUMWANNI PRIMARY",
+  "BURUBURU I PRIMARY",
+  "ROYSAMBU PRIMARY",
+  "KAHAWA PRIMARY",
+  "KAMITI PRIMARY",
+  "KAWAHA GARRISON SECONDARY",
+  "GITHURAI PRIMARY",
+  "GARDEN ESTATE PRIMARY",
+  "KENYATTA UNIVERSITY PRIMARY",
+  "MAHIGA PRIMARY",
+  "KIWANJA PRIMARY",
+  "MARURUI PRIMARY",
+  "NJATHAINI PRIMARY",
+  "NGUNYUMU PRIMARY",
+  "MATHARE 4A PRIMARY",
+  "THIKA ROAD PRIMARY",
+  "G.S.U. PRIMARY",
+  "DANIEL COMBONI PRIMARY",
+  "MUTHAIGA PRIMARY",
+  "MARURA PRIMARY",
+  "M.M. CHANDARIA PRIMARY",
+  "KASARANI PRIMARY",
+  "KARIOBANGI NORTH GIRLS SECONDARY SCHOOL",
+  "MUREMA PRIMARY",
+  "MATHARE NORTH PRIMARY SCHOOL",
+  "BABA DOGO PRIMARY SCHOOL",
+  "DRIVE-IN PRIMARY SCHOOL",
+  "TREESIDE SPECIAL SCHOOL",
+  "KAREN 'C' PRIMARY",
+  "NGONG FOREST PRIMARY",
+  "ST. MARY'S KAREN PRIMARY",
+  "AYANY PRIMARY",
+  "LANGATA ROAD PRIMARY",
+  "RAILA EDUCATION CENTRE",
+  "NGEI PRIMARY",
+  "KONGONI PRIMARY",
+  "LANGATA WEST PRIMARY",
+  "UHURU GARDENS PRIMARY",
+  "MADARAKA PRIMARY SCHOOL",
+  "OLYMPIC PRIMARY",
+  "LANGATA BARRACKS PRIMARY",
+  "KIBERA PRIMARY",
+  "NAIROBI WEST DAY NUSERY",
+  "RABAI ROAD PRIMARY",
+  "BARAKA PRIMARY",
+  "HARAMBEE PRIMARY",
+  "OFAFA JERICHO PRIMARY",
+  "ST. MICHAEL'S PRIMARY",
+  "ST. ANNE'S PRIMARY",
+  "DR. KRAPF PRIMARY",
+  "JOGOO ROAD PRIMARY",
+  "ST. PAUL'S PRIMARY",
+  "MARTIN LUTHER PRIMARY",
+  "MARIAKANI PRIMARY",
+  "STAR OF HOPE LUNGA LUNGA",
+  "JOSEPH APUDO PRIMARY",
+  "MAKONGENI PRIMARY",
+  "OUR LADY OF MERCY SOUTH 'B'",
+  "PLAINSVIEW PRIMARY",
+  "ST. ELIZABETH LUNGA LUNGA",
+  "ST. BAKHITA PRIMARY",
+  "MUKURU PRIMARY",
+  "NAIROBI SOUTH PRIMARY",
+  "NILE ROAD SPECIAL SCHOOL",
+  "ST. JOHN'S PRIMARY",
+  "BIDII PRIMARY",
+  "KALOLENI PRIMARY",
+  "ST. PATRICK'S PRIMARY SCHOOL",
+  "TANA DAY NURSERY",
+  "NJORO CLOSE DAY NURSERY SCHOOL",
+  "OFAFA DAY NURSERY",
+  "KALOLENI DAY NURSERY",
+  "MBOTELA DAY NURSERY",
+  "ST. CATHERINE'S PRIMARY",
+  "CANON APOLO PRIMARY",
+  "RIVER BANK PRIMARY",
+  "PUMWANI PRIMARY",
+  "S.S.D. PRIMARY",
+  "MURANG'A ROAD PRIMARY",
+  "PARKLANDS PRIMARY",
+  "DR. AGGREY PRIMARY",
+  "MATHARI PRIMARY",
+  "NDURURUNO PRIMARY",
+  "AINSWOTH STREET PRIMARY",
+  "ARYA PRIMARY",
+  "KIBORO PRIMARY",
+  "NG'ETHU WATER WORKS",
+  "RACECOURSE PRIMARY",
+  "VALLEY BRIDGE PRIMARY",
+  "SALAMA PRIMARY",
+  "MUSLIM PRIMARY",
+  "ST. TERESA'S GIRLS PRIMARY",
+  "ISLAMIA PRIMARY",
+  "ST. BRIGIDS PRIMARY",
+  "PANGANI PRIMARY",
+  "HURUMA PRIMARY",
+  "MOI AVENUE PRIMARY",
+  "ST. PETER CLAVERS PRIMARY",
+  "CITY PRIMARY",
+  "PARKROAD PRIMARY",
+  "C.G.H.U. PRIMARY",
+  "JUJA ROAD PRIMARY",
+  "PUMWANI PRIMARY SCHOOL",
+  "CENTRAL DAY CURSERY",
+  "PARKLANDS DAY NURSERY",
+  "NGARA EAST DAY NURSERY",
+  "STAREHE DAY NURSERY",
+  "ZIWANI DAY NURSERY",
+  "DAIMA PRIMARY",
+  "MATHARE TECHNICAL SPECIAL",
+  "KABETE VET LAB PRIMARY",
+  "KIHUMBUINI PRIMARY",
+  "NAIROBI PRIMARY",
+  "MILIMANI PRIMARY",
+  "LAVINGTON PRIMARY SCHOOL",
+  "STATE HOUSE PRIMARY",
+  "KILELESHWA PRIMARY",
+  "NEW KIHUMBUINI PRIMARY",
+  "KILIMANI PRIMARY",
+  "AGA KHAN PRIMARY",
+  "FARASI LANE PRIMARY",
+  "VISA OSHWAL PRIMARY - NAIROBI",
+  "BOHRA PRIMARY SCHOOL",
+  "KABETE REHABILITATION SCHOOL",
+  "HOSPITAL HILL PRIMARY",
+  "HIGHRIDGE PRIMARY",
+  "JACARANDA SPECIAL SCHOOL",
+  "NORTH HIGHRIDGE PRIMARY",
+  "MUGUGA GREEN PRIMARY",
+  "WESTLANDS PRIMARY",
+  "KARURA FOREST PRIMARY",
+  "CHELETA PRIMARY",
+  "LOWER KABETE PRIMARY",
+  "KANGEMI PRIMARY",
+  "ST. GEORGE'S PRIMARY",
+  "LORESHO PRIMARY",
+  "STATE HOUSE DAY NURSERY",
+  "KILELESHWA DAY NURSERY",
+  "LADY NORTHEY DAY NURSERY",
+  "HIGHWAY SECONDARY SCHOOL",
+  "PARKLANDS BAPTIST SCHOOL",
+];
+
+const ACADEMICS = [
+  "Talanta",
+  "JB Academy",
+  "Muqs",
+  "Bumble Bee Sports",
+  "Discovery Tennis",
+  "TY SPORTS",
+  "Terriffic Tennis",
+  "TY SPORTS",
+  "Next Gen Multi Sport Academu",
+];
+
+const INSTITUTE_TYPES = [
+  "Kaiso School",
+  "Goverment School",
+  "Academics",
+  "Other",
+] as const;
+
+const getInstituteOptions = (type: string): string[] => {
+  switch (type) {
+    case "Kaiso School":
+      return KAISO_SCHOOLS;
+    case "Goverment School":
+      return GOVERNMENT_SCHOOLS;
+    case "Academics":
+      return ACADEMICS;
+    default:
+      return [];
+  }
+};
+
 const AdminInstitutions = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,11 +325,9 @@ const AdminInstitutions = () => {
   const [showSponsorshipInfo, setShowSponsorshipInfo] = useState(false);
   const [showPaymentInfo, setShowPaymentInfo] = useState(false);
   const [formData, setFormData] = useState({
+    institution_type: "",
     name: "",
     email: "",
-    address: "",
-    contactPerson: "",
-    contactPhone: "",
   });
   
   // State for API data
@@ -71,9 +368,7 @@ const AdminInstitutions = () => {
     setFormData({
       name: institution.name,
       email: institution.email,
-      address: institution.address || "",
-      contactPerson: institution.contact_person,
-      contactPhone: institution.phone || "",
+      institution_type: institution.institution_type || "",
     });
   };
 
@@ -158,60 +453,42 @@ const AdminInstitutions = () => {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Add New Institution</DialogTitle>
-                <DialogDescription>
-                  Register a new institution for the sports festival
-                </DialogDescription>
+                <DialogDescription>Provide institute type, name and email</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Institution Name</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      placeholder="Enter institution name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="Enter email address"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="institution_type">Institute Type</Label>
+                  <Select value={formData.institution_type} onValueChange={(v) => setFormData({ ...formData, institution_type: v, name: "" })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select institute type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INSTITUTE_TYPES.map((t) => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
-                  <Label htmlFor="address">Address</Label>
-                  <Textarea
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    placeholder="Enter institution address"
-                  />
+                  <Label htmlFor="name">Institute Name</Label>
+                  {formData.institution_type === "Other" ? (
+                    <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Enter institute name" />
+                  ) : (
+                    <Select value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select institute name" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {getInstituteOptions(formData.institution_type).map((n) => (
+                          <SelectItem key={n} value={n}>{n}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="contactPerson">Contact Person</Label>
-                    <Input
-                      id="contactPerson"
-                      value={formData.contactPerson}
-                      onChange={(e) => setFormData({...formData, contactPerson: e.target.value})}
-                      placeholder="Enter contact person name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contactPhone">Contact Phone</Label>
-                    <Input
-                      id="contactPhone"
-                      value={formData.contactPhone}
-                      onChange={(e) => setFormData({...formData, contactPhone: e.target.value})}
-                      placeholder="Enter contact phone"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="email">Institute Email</Label>
+                  <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="Enter institute email" />
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" onClick={() => setShowAddForm(false)}>
@@ -420,32 +697,7 @@ const AdminInstitutions = () => {
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="editAddress">Address</Label>
-                        <Textarea
-                          id="editAddress"
-                          value={formData.address}
-                          onChange={(e) => setFormData({...formData, address: e.target.value})}
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="editContactPerson">Contact Person</Label>
-                          <Input
-                            id="editContactPerson"
-                            value={formData.contactPerson}
-                            onChange={(e) => setFormData({...formData, contactPerson: e.target.value})}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="editContactPhone">Contact Phone</Label>
-                          <Input
-                            id="editContactPhone"
-                            value={formData.contactPhone}
-                            onChange={(e) => setFormData({...formData, contactPhone: e.target.value})}
-                          />
-                        </div>
-                      </div>
+                      {/* Fields trimmed as per new minimal form */}
                       <div className="flex justify-end gap-2">
                         <Button variant="outline" onClick={() => setEditMode(false)}>
                           Cancel

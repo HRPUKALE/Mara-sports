@@ -29,6 +29,8 @@ const InstitutionStudentManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSport, setFilterSport] = useState("");
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<any>(null);
   
 
   const [newStudent, setNewStudent] = useState({
@@ -38,7 +40,17 @@ const InstitutionStudentManagement = () => {
     dateOfBirth: "",
     gender: "",
     studentId: "",
-    sports: [] as string[],
+    sport: "",
+    subCategory: "",
+  });
+
+  const [sportsOptions] = useState<{[k:string]: string[]}>({
+    Football: ["U14 Boys", "U16 Boys", "U18 Girls"],
+    Basketball: ["U16 Boys", "U16 Girls"],
+    Tennis: ["Singles U14", "Singles U16", "Doubles U18"],
+    Swimming: ["50m Freestyle", "100m Backstroke"],
+    Athletics: ["100m", "200m", "Hurdles"],
+    Badminton: ["Singles", "Doubles"],
   });
 
   // Mock student data
@@ -62,9 +74,20 @@ const InstitutionStudentManagement = () => {
       dateOfBirth: "",
       gender: "",
       studentId: "",
-      sports: [],
+      sport: "",
+      subCategory: "",
     });
     setShowAddDialog(false);
+  };
+
+  const startEditStudent = (student: any) => {
+    setEditingStudent(student);
+    setShowEditDialog(true);
+  };
+
+  const handleEditSave = () => {
+    toast({ title: "Student updated", description: `${editingStudent?.name} updated.` });
+    setShowEditDialog(false);
   };
 
 
@@ -194,18 +217,28 @@ const InstitutionStudentManagement = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Sports Information</Label>
-                  <Select value={newStudent.sports[0] || ""} onValueChange={(value) => setNewStudent(prev => ({ ...prev, sports: [value] }))}>
+                  <Label>Sport</Label>
+                  <Select value={newStudent.sport} onValueChange={(value) => setNewStudent(prev => ({ ...prev, sport: value, subCategory: "" }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a sport" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Football">Football</SelectItem>
-                      <SelectItem value="Basketball">Basketball</SelectItem>
-                      <SelectItem value="Tennis">Tennis</SelectItem>
-                      <SelectItem value="Swimming">Swimming</SelectItem>
-                      <SelectItem value="Athletics">Athletics</SelectItem>
-                      <SelectItem value="Badminton">Badminton</SelectItem>
+                      {Object.keys(sportsOptions).map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Sub-category</Label>
+                  <Select value={newStudent.subCategory} onValueChange={(value) => setNewStudent(prev => ({ ...prev, subCategory: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select sub-category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(sportsOptions[newStudent.sport] || []).map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -319,7 +352,7 @@ const InstitutionStudentManagement = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-1">
-                      <Button variant="ghost" size="sm" title="Edit Student">
+                      <Button variant="ghost" size="sm" title="Edit Student" onClick={() => startEditStudent(student)}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="sm" title="Delete Student" className="text-destructive hover:text-destructive">
@@ -333,6 +366,57 @@ const InstitutionStudentManagement = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Student</DialogTitle>
+            <DialogDescription>Update student profile and sports category.</DialogDescription>
+          </DialogHeader>
+          {editingStudent && (
+            <form onSubmit={(e)=>{e.preventDefault();handleEditSave();}} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>First Name</Label>
+                  <Input defaultValue={editingStudent.name.split(' ')[0]} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Last Name</Label>
+                  <Input defaultValue={editingStudent.name.split(' ').slice(1).join(' ')} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input defaultValue={editingStudent.email} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Student ID</Label>
+                  <Input defaultValue={editingStudent.studentId} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Sport</Label>
+                <Select defaultValue={editingStudent.sports[0] || ""}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(sportsOptions).map((s)=>(
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={()=>setShowEditDialog(false)}>Cancel</Button>
+                <Button type="submit" className="bg-gradient-primary">Save</Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

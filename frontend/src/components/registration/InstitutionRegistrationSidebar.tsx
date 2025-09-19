@@ -6,6 +6,7 @@ import { Building, Trophy, Users, CreditCard, CheckCircle } from "lucide-react";
 interface InstitutionRegistrationSidebarProps {
   currentStep: number;
   completedSteps: number[];
+  showOnMobile?: boolean;
 }
 
 const steps = [
@@ -37,10 +38,11 @@ const steps = [
 
 export const InstitutionRegistrationSidebar = ({ 
   currentStep, 
-  completedSteps 
+  completedSteps,
+  showOnMobile = false,
 }: InstitutionRegistrationSidebarProps) => {
   return (
-    <div className="w-80 bg-muted/50 border-r p-6 overflow-y-auto">
+    <div className={(showOnMobile ? "block" : "hidden md:block") + " w-80 bg-muted/50 border-r p-6 overflow-y-auto md:sticky md:top-0 md:self-start md:max-h-screen"}>
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-xl font-bold text-foreground">Institution Registration</h2>

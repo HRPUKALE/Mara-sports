@@ -20,7 +20,6 @@ import {
   CheckCircle,
   Clock,
   Send,
-  Eye,
   XCircle,
   AlertCircle,
   Loader2

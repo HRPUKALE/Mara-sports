@@ -22,7 +22,6 @@ const AdminSponsorships = () => {
     phone: "",
     company: "",
     amount: "",
-    notes: ""
   });
   
   // State for API data
@@ -84,7 +83,7 @@ const AdminSponsorships = () => {
       description: "Add sponsor functionality will be implemented soon.",
     });
     setShowAddSponsorDialog(false);
-    setSponsorFormData({ name: "", email: "", phone: "", company: "", amount: "", notes: "" });
+    setSponsorFormData({ name: "", email: "", phone: "", company: "", amount: "" });
   };
 
   const exportSponsorships = () => {
@@ -187,14 +186,6 @@ const AdminSponsorships = () => {
                     value={sponsorFormData.amount}
                     onChange={(e) => setSponsorFormData({...sponsorFormData, amount: e.target.value})}
                     placeholder="Enter sponsorship amount"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Notes</label>
-                  <Input
-                    value={sponsorFormData.notes}
-                    onChange={(e) => setSponsorFormData({...sponsorFormData, notes: e.target.value})}
-                    placeholder="Enter additional notes"
                   />
                 </div>
                 <div className="flex justify-end gap-2">

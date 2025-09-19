@@ -11,6 +11,7 @@ import {
 interface RegistrationSidebarProps {
   currentStep: number;
   completedSteps: number[];
+  showOnMobile?: boolean;
 }
 
 const steps = [
@@ -46,9 +47,9 @@ const steps = [
   }
 ];
 
-export const RegistrationSidebar = ({ currentStep, completedSteps }: RegistrationSidebarProps) => {
+export const RegistrationSidebar = ({ currentStep, completedSteps, showOnMobile = false }: RegistrationSidebarProps) => {
   return (
-    <div className="w-64 bg-card border-r border-border p-6 min-h-screen">
+    <div className={(showOnMobile ? "block" : "hidden md:block") + " w-64 bg-card border-r border-border p-6 min-h-screen md:sticky md:top-0 md:self-start md:max-h-screen overflow-auto"}>
       <div className="mb-8">
         <h2 className="text-xl font-bold text-foreground">Registration Progress</h2>
         <p className="text-sm text-muted-foreground mt-1">Complete all steps to register</p>

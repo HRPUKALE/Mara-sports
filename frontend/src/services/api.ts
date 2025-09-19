@@ -47,7 +47,9 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        // Surface server error details when available
+        const serverMsg = (data && (data.detail || data.message || data.error)) as string | undefined;
+        throw new Error(serverMsg || `HTTP error! status: ${response.status}`);
       }
 
       return {
@@ -262,34 +264,60 @@ class ApiService {
     return this.request('/admin/sports');
   }
 
+  async createSport(sportData: any) {
+    return this.request('/sports', {
+      method: 'POST',
+      body: JSON.stringify(sportData)
+    });
+  }
+
+  async updateSport(sportId: string, sportData: any) {
+    return this.request(`/sports/${sportId}`, {
+      method: 'PUT',
+      body: JSON.stringify(sportData)
+    });
+  }
+
+  async deleteSport(sportId: string) {
+    return this.request(`/sports/${sportId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async addSubCategory(sportId: string, subCategoryData: any) {
+    return this.request(`/sports/${sportId}/subcategories`, {
+      method: 'POST',
+      body: JSON.stringify(subCategoryData)
+    });
+  }
+
+  async updateSubCategory(subCategoryId: string, subCategoryData: any) {
+    return this.request(`/subcategories/${subCategoryId}`, {
+      method: 'PUT',
+      body: JSON.stringify(subCategoryData)
+    });
+  }
+
+  async deleteSubCategory(subCategoryId: string) {
+    return this.request(`/subcategories/${subCategoryId}`, {
+      method: 'DELETE'
+    });
+  }
+
   async getAdminSponsorships() {
     return this.request('/admin/sponsorships');
   }
 
   // --- Student Registration Methods ---
   async registerStudent(studentData: any): Promise<ApiResponse<any>> {
-    return this.request('POST', '/api/v1/students/register', studentData);
-  }
-
-  async getStudent(studentId: string): Promise<ApiResponse<any>> {
-    return this.request('GET', `/api/v1/students/${studentId}`);
-  }
-
-  async updateStudent(studentId: string, studentData: any): Promise<ApiResponse<any>> {
-    return this.request('PUT', `/api/v1/students/${studentId}`, studentData);
+    return this.request('/students/register', {
+      method: 'POST',
+      body: JSON.stringify(studentData)
+    });
   }
 
   async getStudentByUserId(userId: string): Promise<ApiResponse<any>> {
-    return this.request('GET', `/api/v1/students/user/${userId}`);
-  }
-
-  async getStudents(params?: { skip?: number; limit?: number }): Promise<ApiResponse<any[]>> {
-    const queryParams = new URLSearchParams();
-    if (params?.skip) queryParams.append('skip', params.skip.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    
-    const queryString = queryParams.toString();
-    return this.request(`/api/v1/students${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/students/user/${userId}`);
   }
 }
 

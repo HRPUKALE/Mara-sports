@@ -119,12 +119,15 @@ const UnifiedLoginPage = () => {
       if (response.data) {
         const data = response.data as any;
         
-        // Store auth token
-        localStorage.setItem('authToken', data.token);
+        // Store auth token (backend returns access_token)
+        const accessToken = data.access_token || data.token;
+        if (accessToken) {
+          localStorage.setItem('authToken', accessToken);
+        }
         
         // Create user profile based on role
         const userProfile = {
-          id: data.user_id,
+          id: data.user_id || data.sub || "",
           fullName: data.full_name || 'User',
           email: data.email,
           dateOfBirth: '',

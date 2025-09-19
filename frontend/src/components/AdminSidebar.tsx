@@ -40,7 +40,7 @@ export function AdminSidebar() {
       : "hover:bg-muted/50";
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
