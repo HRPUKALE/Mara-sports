@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\aditya thorat\Downloads\Mara_sport\Mara-sports-main\backend\adi"
+VIRTUAL_ENV="C:\Users\aditya thorat\Downloads\Mara-sports-main\Mara-sports-main\Mara-sports\backend\adi"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
