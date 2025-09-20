@@ -165,6 +165,10 @@ class ApiService {
     return this.request(`/sports/${sportId}/categories`);
   }
 
+  async getSubCategories(categoryId: string) {
+    return this.request(`/categories/${categoryId}/subcategories`);
+  }
+
   // Registration APIs
   async createRegistration(registrationData: any) {
     return this.request('/registrations', {
@@ -318,6 +322,32 @@ class ApiService {
 
   async getStudentByUserId(userId: string): Promise<ApiResponse<any>> {
     return this.request(`/students/user/${userId}`);
+  }
+
+  // Student Sports Management APIs
+  async addStudentSports(studentId: string, sportsData: any[]) {
+    return this.request(`/students/${studentId}/sports`, {
+      method: 'POST',
+      body: JSON.stringify({ selectedSports: sportsData }),
+    });
+  }
+
+  async updateStudentSports(studentId: string, sportsData: any[]) {
+    return this.request(`/students/${studentId}/sports`, {
+      method: 'PUT',
+      body: JSON.stringify({ selectedSports: sportsData }),
+    });
+  }
+
+  async removeStudentSports(studentId: string, sportIds: string[]) {
+    return this.request(`/students/${studentId}/sports`, {
+      method: 'DELETE',
+      body: JSON.stringify({ sportIds }),
+    });
+  }
+
+  async getStudentSports(studentId: string) {
+    return this.request(`/students/${studentId}/sports`);
   }
 }
 

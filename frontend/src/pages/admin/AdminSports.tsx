@@ -8,7 +8,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Download, ChevronDown, ChevronRight, Trophy, Users, DollarSign, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Edit, Trash2, Download, ChevronDown, ChevronRight, Trophy, Users, DollarSign, Loader2, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
 import { 
@@ -25,6 +26,7 @@ import {
 
 const AdminSports = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
@@ -45,7 +47,6 @@ const AdminSports = () => {
   const [newSubCategory, setNewSubCategory] = useState({ 
     parentSport: "", 
     name: "", 
-    fee: "", 
     gender: "Open",
     level: 1
   });
@@ -400,7 +401,7 @@ const AdminSports = () => {
         description: "Sub-category added successfully!",
       });
       
-      setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 });
+      setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 });
       
       // Refresh sports list
       fetchSports();
@@ -419,7 +420,6 @@ const AdminSports = () => {
     setNewSubCategory({
       parentSport: subCategory.sportId || "",
       name: subCategory.name || "",
-      fee: subCategory.fee?.toString() || subCategory.fees?.toString() || "",
       gender: subCategory.gender || subCategory.gender_allowed || "Both",
       level: subCategory.level || 1
     });
@@ -448,7 +448,7 @@ const AdminSports = () => {
       
       setIsEditSubCategoryOpen(false);
       setEditingSubCategory(null);
-      setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 });
+      setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 });
       
       // Refresh sports list
       fetchSports();
@@ -1174,16 +1174,6 @@ const AdminSports = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="editSubCategoryFee">Fee (₹)</Label>
-                <Input
-                  id="editSubCategoryFee"
-                  type="number"
-                  value={newSubCategory.fee}
-                  onChange={(e) => setNewSubCategory({...newSubCategory, fee: e.target.value})}
-                  placeholder="500"
-                />
-              </div>
-              <div>
                 <Label htmlFor="editSubCategoryLevel">Level</Label>
                 <Select 
                   value={(newSubCategory.level || 1).toString()} 
@@ -1222,7 +1212,7 @@ const AdminSports = () => {
               <Button variant="outline" onClick={() => {
                 setIsEditSubCategoryOpen(false);
                 setEditingSubCategory(null);
-                setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 });
+                setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 });
               }}>
                 Cancel
               </Button>
@@ -1280,6 +1270,16 @@ const AdminSports = () => {
                         <Badge variant={sport.is_active ? "default" : "secondary"}>
                           {sport.is_active ? "Active" : "Inactive"}
                         </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/admin/sports/${sport.id}`);
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1423,16 +1423,6 @@ const AdminSports = () => {
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                  <Label htmlFor="subCategoryFee">Fee (₹)</Label>
-                                  <Input
-                                    id="subCategoryFee"
-                                    type="number"
-                                    value={newSubCategory.fee}
-                                    onChange={(e) => setNewSubCategory({...newSubCategory, fee: e.target.value})}
-                                    placeholder="500"
-                                  />
-                                </div>
-                                <div>
                                   <Label htmlFor="subCategoryLevel">Level</Label>
                                   <Select 
                                     value={(newSubCategory.level || 1).toString()} 
@@ -1468,7 +1458,7 @@ const AdminSports = () => {
                                 </Select>
                               </div>
                               <div className="flex flex-col sm:flex-row justify-end gap-2">
-                                <Button variant="outline" onClick={() => setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 })} className="w-full sm:w-auto">
+                                <Button variant="outline" onClick={() => setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 })} className="w-full sm:w-auto">
                                   Cancel
                                 </Button>
                                 <Button onClick={() => handleAddSubCategory(sport.id)} className="w-full sm:w-auto">

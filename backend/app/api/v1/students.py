@@ -400,3 +400,59 @@ async def get_student(
         created_at=student.created_at,
         updated_at=student.updated_at,
     )
+
+
+@router.put("/{student_id}", response_model=StudentResponse)
+async def update_student(
+    student_id: UUID,
+    update_data: StudentUpdate,
+    current_user: User = Depends(get_current_user_dependency),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Update student by ID.
+    
+    Updates student profile information. Only admins can update any student.
+    """
+    student_repo = StudentRepository(Student, db)
+    
+    # Get student
+    student = await student_repo.get(student_id)
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found"
+        )
+    
+    # Check permissions - only admins can update any student
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied - Admin privileges required"
+        )
+    
+    # Update student data
+    update_dict = update_data.dict(exclude_unset=True)
+    updated_student = await student_repo.update(student.id, update_dict)
+    
+    return StudentResponse(
+        id=updated_student.id,
+        user_id=updated_student.user_id,
+        first_name=updated_student.first_name,
+        middle_name=updated_student.middle_name,
+        last_name=updated_student.last_name,
+        full_name=updated_student.full_name,
+        gender=updated_student.gender,
+        date_of_birth=updated_student.date_of_birth,
+        age=updated_student.age,
+        phone=updated_student.phone,
+        address=updated_student.address,
+        medical_info=updated_student.medical_info,
+        guardian=updated_student.guardian,
+        institution_id=updated_student.institution_id,
+        student_id=updated_student.student_id,
+        profile_picture=updated_student.profile_picture,
+        is_active=updated_student.is_active,
+        created_at=updated_student.created_at,
+        updated_at=updated_student.updated_at,
+    )

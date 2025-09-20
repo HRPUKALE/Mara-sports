@@ -35,6 +35,8 @@ import AdminPayments from "./pages/admin/AdminPayments";
 import AdminInvoices from "./pages/admin/AdminInvoices";
 import AdminSponsorships from "./pages/admin/AdminSponsorships";
 import AdminSports from "./pages/admin/AdminSports";
+import SportDetails from "./pages/admin/SportDetails";
+import StudentDetails from "./pages/admin/StudentDetails";
 import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -132,6 +134,8 @@ const App = () => (
               <Route path="invoices" element={<AdminInvoices />} />
               <Route path="sponsorships" element={<AdminSponsorships />} />
               <Route path="sports" element={<AdminSports />} />
+              <Route path="sports/:id" element={<SportDetails />} />
+              <Route path="students/:id" element={<StudentDetails />} />
             </Route>
             
             <Route path="*" element={<NotFound />} />

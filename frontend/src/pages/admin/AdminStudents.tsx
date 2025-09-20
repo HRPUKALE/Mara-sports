@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,12 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Search, Filter, Eye, Edit, Trash2, Download, User, Building2, Calendar, Loader2 } from "lucide-react";
+import { Search, Filter, Eye, Edit, Trash2, Download, User, Building2, Calendar, Loader2, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
+import { StudentSportsAssignment } from "@/components/admin/StudentSportsAssignment";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminStudents = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedInstitution, setSelectedInstitution] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -29,6 +33,7 @@ const AdminStudents = () => {
     student_id: "",
     institution_type: "",
     institution_name: "",
+    assignedSports: [],
   });
   
   // State for API data
@@ -75,11 +80,30 @@ const AdminStudents = () => {
       student_id: student.student_id || "",
       institution_type: student.institution_type || "",
       institution_name: student.institution_name || "",
+      assignedSports: student.assignedSports || [],
     });
     setShowEditDialog(true);
   };
 
   const handleSaveStudent = async () => {
+    // Validate required fields
+    const errors: string[] = [];
+    if (!editForm.first_name) errors.push("First name is required");
+    if (!editForm.last_name) errors.push("Last name is required");
+    if (!editForm.email) errors.push("Email is required");
+    if (!editForm.student_id) errors.push("Student ID is required");
+    if (!editForm.institution_type) errors.push("Institution type is required");
+    if (!editForm.institution_name) errors.push("Institution name is required");
+
+    if (errors.length > 0) {
+      toast({
+        title: "Validation Error",
+        description: errors.join(", "),
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       await apiService.updateStudent(selectedStudent.id, editForm);
       toast({ title: "Updated", description: "Student updated successfully" });
@@ -107,6 +131,24 @@ const AdminStudents = () => {
   };
 
   const handleAddStudent = async () => {
+    // Validate required fields
+    const errors: string[] = [];
+    if (!addForm.first_name) errors.push("First name is required");
+    if (!addForm.last_name) errors.push("Last name is required");
+    if (!addForm.email) errors.push("Email is required");
+    if (!addForm.student_id) errors.push("Student ID is required");
+    if (!addForm.institution_type) errors.push("Institution type is required");
+    if (!addForm.institution_name) errors.push("Institution name is required");
+
+    if (errors.length > 0) {
+      toast({
+        title: "Validation Error",
+        description: errors.join(", "),
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const payload = {
         first_name: addForm.first_name,
@@ -116,11 +158,12 @@ const AdminStudents = () => {
         student_id: addForm.student_id,
         institution_name: addForm.institution_name,
         institution_type: addForm.institution_type,
+        assignedSports: addForm.assignedSports,
       };
       await apiService.createStudent(payload);
       toast({ title: "Created", description: "Student added successfully" });
       setShowAddDialog(false);
-      setAddForm({ first_name: "", middle_name: "", last_name: "", email: "", student_id: "", institution_type: "", institution_name: "" });
+      setAddForm({ first_name: "", middle_name: "", last_name: "", email: "", student_id: "", institution_type: "", institution_name: "", assignedSports: [] });
       fetchStudents();
     } catch (e) {
       toast({ title: "Error", description: "Failed to add student", variant: "destructive" });
@@ -130,6 +173,15 @@ const AdminStudents = () => {
   const getStatusColor = (isActive: boolean) => {
     return isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
   };
+
+  const handleSportsChange = (sports: any[], isEditMode: boolean = false) => {
+    if (isEditMode) {
+      setEditForm(prev => ({ ...prev, assignedSports: sports }));
+    } else {
+      setAddForm(prev => ({ ...prev, assignedSports: sports }));
+    }
+  };
+
 
   if (loading) {
     return (
@@ -248,12 +300,32 @@ const AdminStudents = () => {
                       <div className="text-sm">
                         <span className="font-medium text-muted-foreground">Email:</span> {student.email}
                       </div>
+                      {student.assignedSports && student.assignedSports.length > 0 && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <Trophy className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            {student.assignedSports.length} sport{student.assignedSports.length !== 1 ? 's' : ''}
+                          </span>
+                          <div className="flex gap-1">
+                            {student.assignedSports.slice(0, 3).map((sport: any, index: number) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {sport.sportName}
+                              </Badge>
+                            ))}
+                            {student.assignedSports.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{student.assignedSports.length - 3} more
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 ml-4">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleViewStudent(student)}
+                        onClick={() => navigate(`/admin/students/${student.id}`)}
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         View
@@ -261,7 +333,7 @@ const AdminStudents = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleEditStudent(student)}
+                        onClick={() => navigate(`/admin/students/edit/${student.id}`)}
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
@@ -318,6 +390,37 @@ const AdminStudents = () => {
                 </div>
               </div>
               
+              {selectedStudent.assignedSports && selectedStudent.assignedSports.length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Assigned Sports</h4>
+                  <div className="space-y-2">
+                    {selectedStudent.assignedSports.map((sport: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Trophy className="h-4 w-4 text-primary" />
+                          <div>
+                            <div className="font-medium">{sport.sportName}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {sport.categoryName} - {sport.subCategoryName}
+                              <br />
+                              Age Group: {sport.ageGroup} | Gender: {sport.gender}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant={sport.sportType === "Individual" ? "default" : "secondary"}>
+                            {sport.sportType}
+                          </Badge>
+                          <Badge variant="outline">
+                            {sport.ageGroup}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div>
                 <h4 className="font-medium mb-2">Actions</h4>
                 <div className="flex gap-2">
@@ -337,12 +440,18 @@ const AdminStudents = () => {
 
       {/* Add Student Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Student</DialogTitle>
-            <DialogDescription>Add a new student with basic details.</DialogDescription>
+            <DialogDescription>Add a new student with basic details and sports assignments.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="details">Student Details</TabsTrigger>
+              <TabsTrigger value="sports">Sports Assignment</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details" className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <Label>First Name</Label>
@@ -453,136 +562,164 @@ const AdminStudents = () => {
               </div>
               <div />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
-              <Button onClick={handleAddStudent}>Save</Button>
-            </div>
+            </TabsContent>
+            
+            <TabsContent value="sports" className="space-y-4">
+              <StudentSportsAssignment
+                selectedSports={addForm.assignedSports}
+                onSportsChange={(sports) => handleSportsChange(sports, false)}
+                studentAge={18} // You can calculate this from birth date if available
+                studentGender={addForm.gender || "Open"}
+              />
+            </TabsContent>
+          </Tabs>
+          
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+            <Button onClick={handleAddStudent}>Save Student</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Edit Student Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Student</DialogTitle>
-            <DialogDescription>Update student details including sports.</DialogDescription>
+            <DialogDescription>Update student details and sports assignments.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label>First Name</Label>
-                <Input value={editForm.first_name || ""} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="details">Student Details</TabsTrigger>
+              <TabsTrigger value="sports">Sports Assignment</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details" className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>First Name</Label>
+                  <Input value={editForm.first_name || ""} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Middle Name</Label>
+                  <Input value={editForm.middle_name || ""} onChange={(e) => setEditForm({ ...editForm, middle_name: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Last Name</Label>
+                  <Input value={editForm.last_name || ""} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} />
+                </div>
               </div>
-              <div>
-                <Label>Middle Name</Label>
-                <Input value={editForm.middle_name || ""} onChange={(e) => setEditForm({ ...editForm, middle_name: e.target.value })} />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>Email</Label>
+                  <Input type="email" value={editForm.email || ""} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+                </div>
+                <div />
+                <div />
               </div>
-              <div>
-                <Label>Last Name</Label>
-                <Input value={editForm.last_name || ""} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label>Email</Label>
-                <Input type="email" value={editForm.email || ""} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
-              </div>
-              <div />
-              <div />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label>Student ID</Label>
-                <Input value={editForm.student_id || ""} onChange={(e) => setEditForm({ ...editForm, student_id: e.target.value })} />
-              </div>
-              <div>
-                <Label>Institute Type</Label>
-                <Select value={editForm.institution_type || ""} onValueChange={(v) => setEditForm({ ...editForm, institution_type: v, institution_name: "" })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Kaiso School">Kaiso School</SelectItem>
-                    <SelectItem value="Goverment School">Goverment School</SelectItem>
-                    <SelectItem value="Academics">Academics</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Institute Name</Label>
-                {editForm.institution_type === "Other" ? (
-                  <Input value={editForm.institution_name || ""} onChange={(e) => setEditForm({ ...editForm, institution_name: e.target.value })} />
-                ) : (
-                  <Select value={editForm.institution_name || ""} onValueChange={(v) => setEditForm({ ...editForm, institution_name: v })}>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>Student ID</Label>
+                  <Input value={editForm.student_id || ""} onChange={(e) => setEditForm({ ...editForm, student_id: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Institute Type</Label>
+                  <Select value={editForm.institution_type || ""} onValueChange={(v) => setEditForm({ ...editForm, institution_type: v, institution_name: "" })}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select name" />
+                      <SelectValue placeholder="Select type" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-72">
-                      {(editForm.institution_type === "Kaiso School" ? [
-                        "Aga Khan Academy",
-                        "Braeburn Garden Estate - BGE",
-                        "Braeburn Gitanga Road - BGR",
-                        "Braeside School, Thika",
-                        "Braeside School, Lavington",
-                        "Brookhouse School, Karen",
-                        "Brookhouse School, Runda",
-                        "Brookhurst International, Lavington",
-                        "Brookhurst International, Kiserian",
-                        "Crawford International School",
-                        "The Banda School",
-                        "French School",
-                        "German School",
-                        "Jawabu School",
-                        "Light International School",
-                        "Makini Cambridge School",
-                        "Nairobi Academy",
-                        "Nairobi Jaffery Academy",
-                        "Oshwal Academy U15 & U17",
-                        "Oshwal Academy U17 & U19",
-                        "Peponi School (overall)",
-                        "Peponi School (Girls Sport)",
-                        "Peponi School (Boys Sport)",
-                        "Rosslyn Academy (overall)",
-                        "Kenton College",
-                        "Rusinga School",
-                        "SABIS International School",
-                        "St Austin's Academy",
-                        "St. Christopher's School",
-                        "Swedish School",
-                        "Woodcreek School",
-                        "West Nairobi School - WNS",
-                        "ISK",
-                        "Durham International School - DIS",
-                      ] : editForm.institution_type === "Goverment School" ? [
-                        "MBAGATHI ROAD PRIMARY",
-                        "NEMBU PRIMARY",
-                        "KAWANGWARE PRIMARY",
-                        "TOI PRIMARY",
-                        "RIRUTA HGM PRIMARY",
-                      ] : editForm.institution_type === "Academics" ? [
-                        "Talanta",
-                        "JB Academy",
-                        "Muqs",
-                        "Bumble Bee Sports",
-                        "Discovery Tennis",
-                        "TY SPORTS",
-                        "Terriffic Tennis",
-                        "TY SPORTS",
-                        "Next Gen Multi Sport Academu",
-                      ] : []).map((n) => (
-                        <SelectItem key={n} value={n}>{n}</SelectItem>
-                      ))}
+                    <SelectContent>
+                      <SelectItem value="Kaiso School">Kaiso School</SelectItem>
+                      <SelectItem value="Goverment School">Goverment School</SelectItem>
+                      <SelectItem value="Academics">Academics</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                )}
+                </div>
+                <div>
+                  <Label>Institute Name</Label>
+                  {editForm.institution_type === "Other" ? (
+                    <Input value={editForm.institution_name || ""} onChange={(e) => setEditForm({ ...editForm, institution_name: e.target.value })} />
+                  ) : (
+                    <Select value={editForm.institution_name || ""} onValueChange={(v) => setEditForm({ ...editForm, institution_name: v })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select name" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {(editForm.institution_type === "Kaiso School" ? [
+                          "Aga Khan Academy",
+                          "Braeburn Garden Estate - BGE",
+                          "Braeburn Gitanga Road - BGR",
+                          "Braeside School, Thika",
+                          "Braeside School, Lavington",
+                          "Brookhouse School, Karen",
+                          "Brookhouse School, Runda",
+                          "Brookhurst International, Lavington",
+                          "Brookhurst International, Kiserian",
+                          "Crawford International School",
+                          "The Banda School",
+                          "French School",
+                          "German School",
+                          "Jawabu School",
+                          "Light International School",
+                          "Makini Cambridge School",
+                          "Nairobi Academy",
+                          "Nairobi Jaffery Academy",
+                          "Oshwal Academy U15 & U17",
+                          "Oshwal Academy U17 & U19",
+                          "Peponi School (overall)",
+                          "Peponi School (Girls Sport)",
+                          "Peponi School (Boys Sport)",
+                          "Rosslyn Academy (overall)",
+                          "Kenton College",
+                          "Rusinga School",
+                          "SABIS International School",
+                          "St Austin's Academy",
+                          "St. Christopher's School",
+                          "Swedish School",
+                          "Woodcreek School",
+                          "West Nairobi School - WNS",
+                          "ISK",
+                          "Durham International School - DIS",
+                        ] : editForm.institution_type === "Goverment School" ? [
+                          "MBAGATHI ROAD PRIMARY",
+                          "NEMBU PRIMARY",
+                          "KAWANGWARE PRIMARY",
+                          "TOI PRIMARY",
+                          "RIRUTA HGM PRIMARY",
+                        ] : editForm.institution_type === "Academics" ? [
+                          "Talanta",
+                          "JB Academy",
+                          "Muqs",
+                          "Bumble Bee Sports",
+                          "Discovery Tennis",
+                          "TY SPORTS",
+                          "Terriffic Tennis",
+                          "TY SPORTS",
+                          "Next Gen Multi Sport Academu",
+                        ] : []).map((n) => (
+                          <SelectItem key={n} value={n}>{n}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowEditDialog(false)}>Cancel</Button>
-              <Button onClick={handleSaveStudent}>Save</Button>
-            </div>
+            </TabsContent>
+            
+            <TabsContent value="sports" className="space-y-4">
+              <StudentSportsAssignment
+                selectedSports={editForm.assignedSports || []}
+                onSportsChange={(sports) => handleSportsChange(sports, true)}
+                studentAge={18} // You can calculate this from birth date if available
+                studentGender={editForm.gender || "Open"}
+              />
+            </TabsContent>
+          </Tabs>
+          
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>Cancel</Button>
+            <Button onClick={handleSaveStudent}>Save Changes</Button>
           </div>
         </DialogContent>
       </Dialog>
