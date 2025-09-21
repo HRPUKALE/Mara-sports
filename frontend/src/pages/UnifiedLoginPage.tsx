@@ -16,7 +16,7 @@ type UserRole = 'student' | 'institution' | 'admin';
 
 const UnifiedLoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setAuthenticatedUser } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -148,6 +148,9 @@ const UnifiedLoginPage = () => {
           }));
         }
         
+        // Update AuthContext state
+        setAuthenticatedUser(userProfile);
+        
         const roleMessages = {
           student: "Welcome to your student dashboard!",
           institution: "Welcome to your institution dashboard.",
@@ -155,7 +158,7 @@ const UnifiedLoginPage = () => {
         
         const redirectPaths = {
           student: "/dashboard",
-          institution: "/institution",
+          institution: "/institution"
         };
         
         toast({

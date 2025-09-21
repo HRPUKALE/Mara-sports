@@ -16,7 +16,6 @@ import {
   User, 
   Trophy, 
   CreditCard, 
-  Bell,
   Medal
 } from "lucide-react";
 
@@ -25,7 +24,6 @@ const menuItems = [
   { title: "Profile Management", url: "/dashboard/profile", icon: User },
   { title: "Sports Registration", url: "/dashboard/sports-registration", icon: Trophy },
   { title: "Payments & Sponsorship", url: "/dashboard/payments", icon: CreditCard },
-  { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
 ];
 
 export function AppSidebar() {

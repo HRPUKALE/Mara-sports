@@ -29,6 +29,10 @@ interface Student {
   allergies?: string;
   medications?: string;
   emergencyMedicalInfo?: string;
+  
+  // Document Uploads
+  studentIdImage?: string;
+  ageProofImage?: string;
 }
 
 interface AuthContextType {
@@ -38,6 +42,7 @@ interface AuthContextType {
   register: (studentData: Partial<Student> & { password: string }) => Promise<boolean>;
   logout: () => void;
   updateProfile: (data: Partial<Student>) => void;
+  setAuthenticatedUser: (user: Student) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -198,6 +203,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const setAuthenticatedUser = (user: Student) => {
+    setStudent(user);
+    setIsAuthenticated(true);
+    localStorage.setItem('student', JSON.stringify(user));
+  };
+
   const value: AuthContextType = {
     student,
     isAuthenticated,
@@ -205,6 +216,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     updateProfile,
+    setAuthenticatedUser,
   };
 
   return (

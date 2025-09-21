@@ -265,7 +265,7 @@ const SportDetails = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  <Badge variant="outline">{sport.gender || "Open"}</Badge>
+                  <Badge variant="outline">{sport.gender || "Other"}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -475,7 +475,7 @@ const SportDetails = () => {
                         <SelectContent>
                           <SelectItem value="Male">Male</SelectItem>
                           <SelectItem value="Female">Female</SelectItem>
-                          <SelectItem value="Open">Open</SelectItem>
+                          <SelectItem value="Open">Other</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -520,7 +520,7 @@ const SportDetails = () => {
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Gender</Label>
-                      <p className="text-sm text-muted-foreground">{sport.gender || "Open"}</p>
+                      <p className="text-sm text-muted-foreground">{sport.gender || "Other"}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -570,7 +570,7 @@ const SportDetails = () => {
                   <SelectContent>
                     <SelectItem value="Male">Male</SelectItem>
                     <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Open">Open</SelectItem>
+                    <SelectItem value="Open">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -15,7 +15,6 @@ import GuardianInfoPage from "./pages/dashboard/GuardianInfoPage";
 import MedicalInfoPage from "./pages/dashboard/MedicalInfoPage";
 import PaymentsPage from "./pages/dashboard/PaymentsPage";
 import ConsentPage from "./pages/dashboard/ConsentPage";
-import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import NotFound from "./pages/NotFound";
 
 // Institution Panel
@@ -110,7 +109,6 @@ const App = () => (
               <Route path="medical-info" element={<MedicalInfoPage />} />
               <Route path="payments" element={<PaymentsPage />} />
               <Route path="consent" element={<ConsentPage />} />
-              <Route path="notifications" element={<NotificationsPage />} />
             </Route>
 
             {/* Institution Panel Routes */}

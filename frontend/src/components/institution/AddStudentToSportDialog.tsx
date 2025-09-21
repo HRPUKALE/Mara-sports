@@ -13,6 +13,8 @@ import { apiService } from "@/services/api";
 interface AddStudentToSportDialogProps {
   onClose: () => void;
   onSave: () => void;
+  sportId?: string; // Optional sport ID for direct assignment
+  sportName?: string; // Optional sport name for display
 }
 
 interface Student {
@@ -53,7 +55,7 @@ interface SportAssignment {
   gender: string;
 }
 
-const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogProps) => {
+const AddStudentToSportDialog = ({ onClose, onSave, sportId, sportName }: AddStudentToSportDialogProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -63,14 +65,13 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [selectedSport, setSelectedSport] = useState("");
+  const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
+  const [selectedSport, setSelectedSport] = useState(sportId || "");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
   const [selectedGender, setSelectedGender] = useState("Open");
   
-  const [sportAssignments, setSportAssignments] = useState<SportAssignment[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [subCategories, setSubCategories] = useState<any[]>([]);
   
@@ -315,114 +316,63 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
   };
 
   const handleStudentSelect = (student: Student) => {
-    setSelectedStudent(student);
-    setSportAssignments([]);
-  };
-
-  const handleAddSportAssignment = () => {
-    if (!selectedSport || !selectedCategory || !selectedSubCategory || !selectedAgeGroup) {
-      toast({
-        title: "Error",
-        description: "Please fill in all sport assignment details",
-        variant: "destructive",
-      });
-      return;
+    const isSelected = selectedStudents.some(s => s.id === student.id);
+    if (isSelected) {
+      setSelectedStudents(selectedStudents.filter(s => s.id !== student.id));
+    } else {
+      setSelectedStudents([...selectedStudents, student]);
     }
-
-    const sport = sports.find(s => s.id === selectedSport);
-    const category = categories.find(c => c.id === selectedCategory);
-    const subCategory = subCategories.find(sc => sc.id === selectedSubCategory);
-
-    if (!sport || !category || !subCategory) return;
-
-    const assignment: SportAssignment = {
-      sportId: selectedSport,
-      sportName: sport.name,
-      categoryId: selectedCategory,
-      categoryName: category.name,
-      subCategoryId: selectedSubCategory,
-      subCategoryName: subCategory.name,
-      ageGroup: selectedAgeGroup,
-      gender: selectedGender,
-    };
-
-    // Check if this exact assignment already exists
-    const exists = sportAssignments.some(
-      a => a.sportId === assignment.sportId && 
-           a.categoryId === assignment.categoryId && 
-           a.subCategoryId === assignment.subCategoryId
-    );
-
-    if (exists) {
-      toast({
-        title: "Error",
-        description: "This sport assignment already exists",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSportAssignments([...sportAssignments, assignment]);
-    
-    // Reset form
-    setSelectedSport("");
-    setSelectedCategory("");
-    setSelectedSubCategory("");
-    setSelectedAgeGroup("");
-    setSelectedGender("Open");
   };
 
-  const handleRemoveAssignment = (index: number) => {
-    setSportAssignments(sportAssignments.filter((_, i) => i !== index));
-  };
-
-  const handleAssignSports = async () => {
+  const handleAssignStudents = async () => {
     try {
       setLoading(true);
       setErrors([]);
 
-      if (!selectedStudent) {
-        setErrors(["Please select a student"]);
+      if (selectedStudents.length === 0) {
+        setErrors(["Please select at least one student"]);
         return;
       }
 
-      if (sportAssignments.length === 0) {
-        setErrors(["Please add at least one sport assignment"]);
+      if (!selectedSport || !selectedCategory || !selectedSubCategory || !selectedAgeGroup) {
+        setErrors(["Please fill in all sport assignment details"]);
         return;
       }
 
-      // Prepare assignment data
-      const assignments = sportAssignments.map(assignment => ({
-        sportId: assignment.sportId,
-        categoryId: assignment.categoryId,
-        subCategoryId: assignment.subCategoryId,
-        ageGroup: assignment.ageGroup,
-        gender: assignment.gender,
+      // Prepare assignment data for all selected students
+      const assignments = selectedStudents.map(student => ({
+        studentId: student.id,
+        sportId: selectedSport,
+        categoryId: selectedCategory,
+        subCategoryId: selectedSubCategory,
+        ageGroup: selectedAgeGroup,
+        gender: selectedGender,
       }));
 
-      // Assign sports to student
-      await apiService.assignStudentSports(selectedStudent.id, {
+      // Assign sports to all selected students
+      await apiService.assignStudentsToSport({
         assignments,
       });
 
       toast({
         title: "Success",
-        description: `${sportAssignments.length} sport(s) assigned to ${selectedStudent.fullName} successfully`,
+        description: `${selectedStudents.length} student(s) assigned to sport successfully`,
       });
 
       onSave();
       onClose();
     } catch (error) {
-      console.error("Error assigning sports:", error);
+      console.error("Error assigning students:", error);
       toast({
         title: "Error",
-        description: "Failed to assign sports to student",
+        description: "Failed to assign students to sport",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
+
 
   const getGenderColor = (gender: string) => {
     switch (gender) {
@@ -437,7 +387,9 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
         <DialogHeader>
-          <DialogTitle>Assign Sports to Student</DialogTitle>
+          <DialogTitle>
+            {sportName ? `Add Students to ${sportName}` : "Add Students to Sport"}
+          </DialogTitle>
         </DialogHeader>
 
         {errors.length > 0 && (
@@ -455,7 +407,12 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
         <div className="space-y-6">
           {/* Student Selection */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Select Student</h3>
+            <h3 className="text-lg font-semibold">Select Students</h3>
+            {selectedStudents.length > 0 && (
+              <div className="text-sm text-muted-foreground">
+                {selectedStudents.length} student(s) selected
+              </div>
+            )}
             
             {/* Search Students */}
             <div className="relative">
@@ -482,7 +439,7 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
               ) : (
                 <div className="space-y-1 p-2">
                   {filteredStudents.map((student) => {
-                    const isSelected = selectedStudent?.id === student.id;
+                    const isSelected = selectedStudents.some(s => s.id === student.id);
                     return (
                       <div
                         key={student.id}
@@ -520,44 +477,58 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
               )}
             </div>
 
-            {/* Selected Student Info */}
-            {selectedStudent && (
+            {/* Selected Students Info */}
+            {selectedStudents.length > 0 && (
               <div className="p-4 bg-blue-50 rounded-lg">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-2">
                   <User className="h-5 w-5 text-blue-600" />
-                  <div>
-                    <div className="font-medium">{selectedStudent.fullName}</div>
-                    <div className="text-sm text-muted-foreground">
-                      ID: {selectedStudent.studentId} • Age: {selectedStudent.age}
+                  <div className="font-medium">Selected Students ({selectedStudents.length})</div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedStudents.map((student) => (
+                    <div key={student.id} className="flex items-center gap-1 bg-white px-2 py-1 rounded text-sm">
+                      <span className="font-medium">{student.fullName}</span>
+                      <span className="text-muted-foreground">({student.studentId})</span>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
 
           {/* Sport Assignment */}
-          {selectedStudent && (
+          {selectedStudents.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Assign Sports</h3>
+              <h3 className="text-lg font-semibold">Sport Details</h3>
               
               {/* Sport Selection Form */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="sport">Sport *</Label>
-                  <Select value={selectedSport} onValueChange={setSelectedSport}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select sport" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sports.map((sport) => (
-                        <SelectItem key={sport.id} value={sport.id}>
-                          {sport.name} ({sport.type})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {!sportId && (
+                  <div className="space-y-2">
+                    <Label htmlFor="sport">Sport *</Label>
+                    <Select value={selectedSport} onValueChange={setSelectedSport}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select sport" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sports.map((sport) => (
+                          <SelectItem key={sport.id} value={sport.id}>
+                            {sport.name} ({sport.type})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                {sportId && (
+                  <div className="space-y-2">
+                    <Label>Sport</Label>
+                    <div className="p-3 bg-gray-50 rounded-md">
+                      <div className="font-medium">{sportName}</div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="category">Category *</Label>
@@ -631,52 +602,7 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>&nbsp;</Label>
-                  <Button 
-                    onClick={handleAddSportAssignment}
-                    disabled={!selectedSport || !selectedCategory || !selectedSubCategory || !selectedAgeGroup}
-                    className="w-full"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Assignment
-                  </Button>
-                </div>
               </div>
-
-              {/* Current Assignments */}
-              {sportAssignments.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="text-md font-medium">Current Assignments ({sportAssignments.length})</h4>
-                  <div className="space-y-2">
-                    {sportAssignments.map((assignment, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Trophy className="h-4 w-4 text-green-600" />
-                          <div>
-                            <div className="font-medium">{assignment.sportName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {assignment.categoryName} • {assignment.subCategoryName} • {assignment.ageGroup}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge className={getGenderColor(assignment.gender)}>
-                            {assignment.gender}
-                          </Badge>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleRemoveAssignment(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -686,11 +612,11 @@ const AddStudentToSportDialog = ({ onClose, onSave }: AddStudentToSportDialogPro
             Cancel
           </Button>
           <Button 
-            onClick={handleAssignSports} 
-            disabled={loading || !selectedStudent || sportAssignments.length === 0}
+            onClick={handleAssignStudents} 
+            disabled={loading || selectedStudents.length === 0 || !selectedSport || !selectedCategory || !selectedSubCategory || !selectedAgeGroup}
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-            Assign {sportAssignments.length} Sport{sportAssignments.length !== 1 ? 's' : ''}
+            Add {selectedStudents.length} Student{selectedStudents.length !== 1 ? 's' : ''}
           </Button>
         </div>
       </DialogContent>

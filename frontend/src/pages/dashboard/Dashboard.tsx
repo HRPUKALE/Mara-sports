@@ -3,11 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotifications } from "@/contexts/NotificationContext";
 import { Link } from "react-router-dom";
 import { 
   Trophy, 
-  Bell, 
   Eye,
   DollarSign,
   Gift,
@@ -19,7 +17,6 @@ import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const { student } = useAuth();
-  const { notifications, unreadCount } = useNotifications();
   const { toast } = useToast();
   
   // State for API data
@@ -118,19 +115,6 @@ const Dashboard = () => {
           </p>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/notifications">
-              <Bell className="h-4 w-4 mr-2" />
-              Notifications
-              {unreadCount > 0 && (
-                <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                  {unreadCount}
-                </Badge>
-              )}
-            </Link>
-          </Button>
-        </div>
       </div>
 
       {/* Stats Cards */}
@@ -191,7 +175,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <Button asChild className="w-full">
-              <Link to="/sports-registration">
+              <Link to="/dashboard/sports-registration">
                 <Trophy className="h-4 w-4 mr-2" />
                 View Sports
               </Link>
@@ -208,7 +192,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/payments">
+              <Link to="/dashboard/payments">
                 <DollarSign className="h-4 w-4 mr-2" />
                 View Payments
               </Link>
@@ -225,7 +209,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/profile">
+              <Link to="/dashboard/profile">
                 <Eye className="h-4 w-4 mr-2" />
                 Edit Profile
               </Link>
@@ -251,7 +235,7 @@ const Dashboard = () => {
                 You haven't registered for any sports yet. Browse available sports to get started!
               </p>
               <Button asChild>
-                <Link to="/sports-registration">
+                <Link to="/dashboard/sports-registration">
                   <Trophy className="h-4 w-4 mr-2" />
                   Browse Sports
                 </Link>

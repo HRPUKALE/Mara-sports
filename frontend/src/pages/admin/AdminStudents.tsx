@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Search, Filter, Eye, Edit, Trash2, Download, User, Building2, Calendar, Loader2, Trophy } from "lucide-react";
+import { Search, Filter, Eye, Edit, Trash2, Download, User, Building2, Calendar, Loader2, Trophy, Phone, Upload, FileText, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
 import { StudentSportsAssignment } from "@/components/admin/StudentSportsAssignment";
@@ -30,9 +30,12 @@ const AdminStudents = () => {
     middle_name: "",
     last_name: "",
     email: "",
+    phone: "",
     student_id: "",
     institution_type: "",
     institution_name: "",
+    student_id_image: null,
+    age_proof_image: null,
     assignedSports: [],
   });
   
@@ -155,15 +158,18 @@ const AdminStudents = () => {
         middle_name: addForm.middle_name,
         last_name: addForm.last_name,
         email: addForm.email,
+        phone: addForm.phone,
         student_id: addForm.student_id,
         institution_name: addForm.institution_name,
         institution_type: addForm.institution_type,
+        student_id_image: addForm.student_id_image,
+        age_proof_image: addForm.age_proof_image,
         assignedSports: addForm.assignedSports,
       };
       await apiService.createStudent(payload);
       toast({ title: "Created", description: "Student added successfully" });
       setShowAddDialog(false);
-      setAddForm({ first_name: "", middle_name: "", last_name: "", email: "", student_id: "", institution_type: "", institution_name: "", assignedSports: [] });
+      setAddForm({ first_name: "", middle_name: "", last_name: "", email: "", phone: "", student_id: "", institution_type: "", institution_name: "", student_id_image: null, age_proof_image: null, assignedSports: [] });
       fetchStudents();
     } catch (e) {
       toast({ title: "Error", description: "Failed to add student", variant: "destructive" });
@@ -471,10 +477,22 @@ const AdminStudents = () => {
                   <Input type="email" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
                 </div>
                 <div>
+                  <Label>Phone Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input 
+                      type="tel" 
+                      placeholder="Enter phone number" 
+                      value={addForm.phone} 
+                      onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })} 
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div>
                   <Label>Student ID</Label>
                   <Input value={addForm.student_id} onChange={(e) => setAddForm({ ...addForm, student_id: e.target.value })} />
                 </div>
-                <div />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
@@ -560,6 +578,90 @@ const AdminStudents = () => {
                   )}
                 </div>
                 <div />
+              </div>
+              
+              {/* Document Upload Fields */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-muted-foreground">Document Upload (Optional)</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Student ID Document */}
+                  <div className="border-2 border-dashed border-border rounded-lg p-4 hover:border-primary/50 transition-smooth">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                          {addForm.student_id_image ? (
+                            <CheckCircle className="h-5 w-5 text-accent" />
+                          ) : (
+                            <Upload className="h-5 w-5 text-primary" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm font-medium cursor-pointer">
+                          Student ID Image
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Upload a clear photo of the student ID card
+                        </p>
+                        <Input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => setAddForm(prev => ({ ...prev, student_id_image: e.target.files?.[0] || null }))}
+                          className="mt-2"
+                        />
+                        {addForm.student_id_image && (
+                          <div className="mt-2 flex items-center space-x-2 text-xs">
+                            <FileText className="h-3 w-3 text-accent" />
+                            <span className="text-accent font-medium">{addForm.student_id_image.name}</span>
+                            <span className="text-muted-foreground">({Math.round(addForm.student_id_image.size / 1024)}KB)</span>
+                          </div>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Accepted formats: JPG, PNG, PDF • Max size: 10MB
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Age Proof Document */}
+                  <div className="border-2 border-dashed border-border rounded-lg p-4 hover:border-primary/50 transition-smooth">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                          {addForm.age_proof_image ? (
+                            <CheckCircle className="h-5 w-5 text-accent" />
+                          ) : (
+                            <Upload className="h-5 w-5 text-primary" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm font-medium cursor-pointer">
+                          Age Proof Document
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Upload birth certificate or age verification document
+                        </p>
+                        <Input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => setAddForm(prev => ({ ...prev, age_proof_image: e.target.files?.[0] || null }))}
+                          className="mt-2"
+                        />
+                        {addForm.age_proof_image && (
+                          <div className="mt-2 flex items-center space-x-2 text-xs">
+                            <FileText className="h-3 w-3 text-accent" />
+                            <span className="text-accent font-medium">{addForm.age_proof_image.name}</span>
+                            <span className="text-muted-foreground">({Math.round(addForm.age_proof_image.size / 1024)}KB)</span>
+                          </div>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Accepted formats: JPG, PNG, PDF • Max size: 10MB
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
             

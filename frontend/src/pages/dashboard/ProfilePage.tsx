@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,13 +8,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, User, Mail, Calendar, School, IdCard, Camera, FileText } from "lucide-react";
+import { Upload, User, Mail, Calendar, School, IdCard, Camera, FileText, Eye, Download } from "lucide-react";
 
 const ProfilePage = () => {
   const { student, updateProfile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [photoLoading, setPhotoLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     fullName: student?.fullName || "",
@@ -27,6 +29,58 @@ const ProfilePage = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please select an image file (JPG, PNG, GIF, etc.)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image smaller than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPhotoLoading(true);
+
+    try {
+      // Create a preview URL for immediate display
+      const previewUrl = URL.createObjectURL(file);
+      
+      // Update the profile with the new photo
+      updateProfile({ profilePicture: previewUrl });
+      
+      toast({
+        title: "Photo Updated",
+        description: "Your profile photo has been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to update profile photo. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setPhotoLoading(false);
+    }
+  };
+
+  const handleChangePhotoClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,15 +140,27 @@ const ProfilePage = () => {
               <div className="text-center space-y-2">
                 <h3 className="font-semibold text-lg">{student?.fullName}</h3>
                 <p className="text-sm text-muted-foreground">{student?.email}</p>
-                <Badge variant={student?.isEmailVerified ? "default" : "destructive"}>
-                  {student?.isEmailVerified ? "Email Verified" : "Email Pending"}
-                </Badge>
               </div>
 
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={handleChangePhotoClick}
+                disabled={photoLoading}
+              >
                 <Camera className="h-4 w-4 mr-2" />
-                Change Photo
+                {photoLoading ? "Uploading..." : "Change Photo"}
               </Button>
+              
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="hidden"
+              />
             </div>
 
             <div className="space-y-3 pt-4 border-t">
@@ -265,30 +331,104 @@ const ProfilePage = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Student ID Document */}
             <div className="space-y-3">
               <h4 className="font-medium">Student ID Document</h4>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Student ID uploaded successfully
-                </p>
-                <Button variant="outline" size="sm">
-                  View Document
-                </Button>
-              </div>
+              {student?.studentIdImage ? (
+                <div className="border-2 border-dashed border-green-200 bg-green-50 rounded-lg p-6 text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FileText className="h-6 w-6 text-green-600" />
+                  </div>
+                  <p className="text-sm text-green-700 mb-3 font-medium">
+                    Student ID uploaded successfully
+                  </p>
+                  <div className="space-y-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => window.open(student.studentIdImage, '_blank')}
+                      className="w-full"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Document
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = student.studentIdImage!;
+                        link.download = `student-id-${student.studentId}.pdf`;
+                        link.click();
+                      }}
+                      className="w-full"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    No Student ID document uploaded
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Contact your institution to upload this document
+                  </p>
+                </div>
+              )}
             </div>
 
+            {/* Age Proof Document */}
             <div className="space-y-3">
               <h4 className="font-medium">Age Proof Document</h4>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Age proof uploaded successfully
-                </p>
-                <Button variant="outline" size="sm">
-                  View Document
-                </Button>
-              </div>
+              {student?.ageProofImage ? (
+                <div className="border-2 border-dashed border-green-200 bg-green-50 rounded-lg p-6 text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FileText className="h-6 w-6 text-green-600" />
+                  </div>
+                  <p className="text-sm text-green-700 mb-3 font-medium">
+                    Age proof uploaded successfully
+                  </p>
+                  <div className="space-y-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => window.open(student.ageProofImage, '_blank')}
+                      className="w-full"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Document
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = student.ageProofImage!;
+                        link.download = `age-proof-${student.studentId}.pdf`;
+                        link.click();
+                      }}
+                      className="w-full"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    No Age Proof document uploaded
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Contact your institution to upload this document
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>

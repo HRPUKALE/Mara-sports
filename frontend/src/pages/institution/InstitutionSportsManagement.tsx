@@ -515,6 +515,8 @@ const InstitutionSportsManagement = () => {
         <AddStudentToSportDialog
           onClose={() => setShowAddStudent(false)}
           onSave={fetchSports}
+          sportId={selectedSport?.id}
+          sportName={selectedSport?.name}
         />
       )}
 
