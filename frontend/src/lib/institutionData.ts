@@ -1,7 +1,7 @@
-<<<<<<< HEAD
 // Institution data constants and utility functions
 
-export const INSTITUTE_TYPES = [
+// General institution types
+export const GENERAL_INSTITUTE_TYPES = [
   "School",
   "College",
   "University",
@@ -10,8 +10,8 @@ export const INSTITUTE_TYPES = [
   "Other"
 ];
 
-// Institution data by type
-export const INSTITUTION_DATA = {
+// General institution data by type
+export const GENERAL_INSTITUTION_DATA = {
   "School": [
     "Delhi Public School",
     "Kendriya Vidyalaya",
@@ -125,19 +125,7 @@ export const INSTITUTION_DATA = {
   "Other": []
 };
 
-// Utility function to get institution options based on type
-export function getInstituteOptions(instituteType: string): string[] {
-  if (instituteType === "Other") {
-    return []; // Return empty array for "Other" type
-  }
-  
-  return INSTITUTION_DATA[instituteType as keyof typeof INSTITUTION_DATA] || [];
-}
-
-
-=======
-// Institution data constants shared between admin panel and registration forms
-
+// Kenyan school data
 export const KAISO_SCHOOLS = [
   "Aga Khan Academy",
   "Braeburn Garden Estate - BGE",
@@ -416,24 +404,31 @@ export const ACADEMICS = [
   "Next Gen Multi Sport Academu",
 ];
 
+// Combined institution types
 export const INSTITUTE_TYPES = [
+  "School",
+  "College", 
+  "University",
+  "Sports Academy",
+  "Sports Club",
   "Kaiso School",
   "Government School",
   "Academics",
-  "Other",
+  "Other"
 ] as const;
 
-export const getInstituteOptions = (type: string): string[] => {
-  switch (type) {
+// Utility function to get institution options based on type
+export function getInstituteOptions(instituteType: string): string[] {
+  switch (instituteType) {
     case "Kaiso School":
       return KAISO_SCHOOLS;
     case "Government School":
       return GOVERNMENT_SCHOOLS;
     case "Academics":
       return ACADEMICS;
-    default:
+    case "Other":
       return [];
+    default:
+      return GENERAL_INSTITUTION_DATA[instituteType as keyof typeof GENERAL_INSTITUTION_DATA] || [];
   }
-};
-
->>>>>>> 47379439 (improved the admin panel more to go)
+}

@@ -38,11 +38,7 @@ export function AppSidebar() {
       : "hover:bg-muted/50";
 
   return (
-<<<<<<< HEAD
     <Sidebar collapsible="offcanvas">
-=======
-    <Sidebar collapsible="icon">
->>>>>>> 47379439 (improved the admin panel more to go)
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">

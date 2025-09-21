@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Settings, LogOut } from "lucide-react";
-<<<<<<< HEAD
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -34,11 +33,6 @@ export function InstitutionHeader() {
       navigate('/login');
     }
   };
-
-=======
-
-export function InstitutionHeader() {
->>>>>>> 47379439 (improved the admin panel more to go)
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center px-4">
@@ -73,11 +67,7 @@ export function InstitutionHeader() {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-<<<<<<< HEAD
               <DropdownMenuItem onClick={handleLogout}>
-=======
-              <DropdownMenuItem>
->>>>>>> 47379439 (improved the admin panel more to go)
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

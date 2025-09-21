@@ -47,10 +47,7 @@ const AdminSports = () => {
   const [newSubCategory, setNewSubCategory] = useState({ 
     parentSport: "", 
     name: "", 
-<<<<<<< HEAD
-=======
     fee: "", 
->>>>>>> 47379439 (improved the admin panel more to go)
     gender: "Open",
     level: 1
   });
@@ -405,11 +402,7 @@ const AdminSports = () => {
         description: "Sub-category added successfully!",
       });
       
-<<<<<<< HEAD
-      setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 });
-=======
       setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 });
->>>>>>> 47379439 (improved the admin panel more to go)
       
       // Refresh sports list
       fetchSports();
@@ -428,10 +421,7 @@ const AdminSports = () => {
     setNewSubCategory({
       parentSport: subCategory.sportId || "",
       name: subCategory.name || "",
-<<<<<<< HEAD
-=======
       fee: subCategory.fee?.toString() || subCategory.fees?.toString() || "",
->>>>>>> 47379439 (improved the admin panel more to go)
       gender: subCategory.gender || subCategory.gender_allowed || "Both",
       level: subCategory.level || 1
     });
@@ -460,11 +450,7 @@ const AdminSports = () => {
       
       setIsEditSubCategoryOpen(false);
       setEditingSubCategory(null);
-<<<<<<< HEAD
-      setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 });
-=======
       setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 });
->>>>>>> 47379439 (improved the admin panel more to go)
       
       // Refresh sports list
       fetchSports();
@@ -1190,8 +1176,6 @@ const AdminSports = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-<<<<<<< HEAD
-=======
                 <Label htmlFor="editSubCategoryFee">Fee (₹)</Label>
                 <Input
                   id="editSubCategoryFee"
@@ -1202,7 +1186,6 @@ const AdminSports = () => {
                 />
               </div>
               <div>
->>>>>>> 47379439 (improved the admin panel more to go)
                 <Label htmlFor="editSubCategoryLevel">Level</Label>
                 <Select 
                   value={(newSubCategory.level || 1).toString()} 
@@ -1241,11 +1224,7 @@ const AdminSports = () => {
               <Button variant="outline" onClick={() => {
                 setIsEditSubCategoryOpen(false);
                 setEditingSubCategory(null);
-<<<<<<< HEAD
-                setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 });
-=======
                 setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 });
->>>>>>> 47379439 (improved the admin panel more to go)
               }}>
                 Cancel
               </Button>
@@ -1308,7 +1287,6 @@ const AdminSports = () => {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-<<<<<<< HEAD
                             navigate(`/admin/sports/${sport.id}`);
                           }}
                         >
@@ -1319,8 +1297,6 @@ const AdminSports = () => {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-=======
->>>>>>> 47379439 (improved the admin panel more to go)
                             handleEditSport(sport);
                           }}
                         >
@@ -1459,8 +1435,6 @@ const AdminSports = () => {
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-<<<<<<< HEAD
-=======
                                   <Label htmlFor="subCategoryFee">Fee (₹)</Label>
                                   <Input
                                     id="subCategoryFee"
@@ -1471,7 +1445,6 @@ const AdminSports = () => {
                                   />
                                 </div>
                                 <div>
->>>>>>> 47379439 (improved the admin panel more to go)
                                   <Label htmlFor="subCategoryLevel">Level</Label>
                                   <Select 
                                     value={(newSubCategory.level || 1).toString()} 
@@ -1507,11 +1480,7 @@ const AdminSports = () => {
                                 </Select>
                               </div>
                               <div className="flex flex-col sm:flex-row justify-end gap-2">
-<<<<<<< HEAD
-                                <Button variant="outline" onClick={() => setNewSubCategory({ parentSport: "", name: "", gender: "Both", level: 1 })} className="w-full sm:w-auto">
-=======
                                 <Button variant="outline" onClick={() => setNewSubCategory({ parentSport: "", name: "", fee: "", gender: "Both", level: 1 })} className="w-full sm:w-auto">
->>>>>>> 47379439 (improved the admin panel more to go)
                                   Cancel
                                 </Button>
                                 <Button onClick={() => handleAddSubCategory(sport.id)} className="w-full sm:w-auto">

@@ -5,11 +5,7 @@ import { UserTypeSelection } from "@/components/registration/UserTypeSelection";
 import { EmailOtpStep } from "@/components/registration/EmailOtpStep";
 import { InstitutionDetailsStep } from "@/components/institution-registration/InstitutionDetailsStep";
 import { SportsSubCategoriesStep } from "@/components/institution-registration/SportsSubCategoriesStep";
-import { ManualStudentAddStep } from "@/components/institution-registration/ManualStudentAddStep";
-<<<<<<< HEAD
-import { EnhancedManualStudentAddStep } from "@/components/institution-registration/EnhancedManualStudentAddStep";
-=======
->>>>>>> 47379439 (improved the admin panel more to go)
+import { SportStudentAddStep } from "@/components/institution-registration/SportStudentAddStep";
 import { InstitutionPaymentStep } from "@/components/institution-registration/InstitutionPaymentStep";
 import { InstitutionRegistrationSidebar } from "@/components/registration/InstitutionRegistrationSidebar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -179,11 +175,7 @@ export const NewInstitutionRegisterPage = () => {
           )}
           
           {currentStep === 3 && (
-<<<<<<< HEAD
-            <EnhancedManualStudentAddStep
-=======
-            <ManualStudentAddStep
->>>>>>> 47379439 (improved the admin panel more to go)
+            <SportStudentAddStep
               initialData={registrationData.students}
               onComplete={(data) => handleStepComplete(3, data)}
               onBack={() => handleBack(3)}
@@ -196,6 +188,7 @@ export const NewInstitutionRegisterPage = () => {
                 ...registrationData.institutionDetails,
                 selectedSports: registrationData.selectedSports?.selectedSports || [],
                 students: registrationData.students?.students || [],
+                sportTeams: registrationData.students?.sportTeams || [],
               }}
               onComplete={handleFinalComplete}
               onBack={() => handleBack(4)}

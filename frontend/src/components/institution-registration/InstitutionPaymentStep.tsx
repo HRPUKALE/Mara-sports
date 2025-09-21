@@ -40,8 +40,19 @@ export const InstitutionPaymentStep = ({
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    const studentCount = institutionData.students?.length || 0;
-    const sportsCount = institutionData.selectedSports?.length || 0;
+    // Handle new data structure with sportTeams
+    let studentCount = 0;
+    let sportsCount = 0;
+    
+    if (institutionData.sportTeams) {
+      // New structure: sportTeams array
+      studentCount = institutionData.sportTeams.reduce((total: number, team: any) => total + team.students.length, 0);
+      sportsCount = institutionData.sportTeams.length;
+    } else {
+      // Fallback to old structure
+      studentCount = institutionData.students?.length || 0;
+      sportsCount = institutionData.selectedSports?.length || 0;
+    }
     
     const studentsFee = studentCount * FEE_PER_STUDENT;
     const sportsFee = sportsCount * FEE_PER_SPORT;
@@ -110,7 +121,9 @@ export const InstitutionPaymentStep = ({
         totalFees: fees.totalFee,
         studentsFee: fees.studentsFee,
         sportsFee: fees.sportsFee,
-        emailsSent: institutionData.students?.length || 0,
+        emailsSent: institutionData.sportTeams 
+          ? institutionData.sportTeams.reduce((total: number, team: any) => total + team.students.length, 0)
+          : institutionData.students?.length || 0,
         status: "payment_emails_sent",
         accountCreated: true
       });
@@ -201,7 +214,10 @@ export const InstitutionPaymentStep = ({
                 <span className="font-medium">Total Students:</span>
               </div>
               <p className="text-sm text-muted-foreground pl-6">
-                {institutionData.students?.length || 0}
+                {institutionData.sportTeams 
+                  ? institutionData.sportTeams.reduce((total: number, team: any) => total + team.students.length, 0)
+                  : institutionData.students?.length || 0
+                }
               </p>
             </div>
           </div>
@@ -212,11 +228,19 @@ export const InstitutionPaymentStep = ({
               <span className="font-medium">Selected Sports:</span>
             </div>
             <div className="pl-6">
-              {institutionData.selectedSports?.map((sport: any, index: number) => (
-                <p key={index} className="text-sm text-muted-foreground">
-                  {sport.sport} - {sport.subCategory}
-                </p>
-              )) || <p className="text-sm text-muted-foreground">No sports selected</p>}
+              {institutionData.sportTeams ? (
+                institutionData.sportTeams.map((team: any, index: number) => (
+                  <p key={index} className="text-sm text-muted-foreground">
+                    {team.sport} - {team.subCategory || team.category} ({team.students.length} students)
+                  </p>
+                ))
+              ) : (
+                institutionData.selectedSports?.map((sport: any, index: number) => (
+                  <p key={index} className="text-sm text-muted-foreground">
+                    {sport.sport} - {sport.subCategory}
+                  </p>
+                )) || <p className="text-sm text-muted-foreground">No sports selected</p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -233,12 +257,15 @@ export const InstitutionPaymentStep = ({
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span>Students Registration Fee ({institutionData.students?.length || 0} × ₹{FEE_PER_STUDENT}):</span>
+              <span>Students Registration Fee ({institutionData.sportTeams 
+                ? institutionData.sportTeams.reduce((total: number, team: any) => total + team.students.length, 0)
+                : institutionData.students?.length || 0
+              } × ₹{FEE_PER_STUDENT}):</span>
               <span className="font-medium">₹{fees.studentsFee.toLocaleString()}</span>
             </div>
             
             <div className="flex justify-between items-center">
-              <span>Sports Registration Fee ({institutionData.selectedSports?.length || 0} × ₹{FEE_PER_SPORT}):</span>
+              <span>Sports Registration Fee ({institutionData.sportTeams?.length || institutionData.selectedSports?.length || 0} × ₹{FEE_PER_SPORT}):</span>
               <span className="font-medium">₹{fees.sportsFee.toLocaleString()}</span>
             </div>
             
@@ -308,7 +335,10 @@ export const InstitutionPaymentStep = ({
           </CardHeader>
           <CardContent>
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-              <p className="font-medium">Payment emails will be sent to all {institutionData.students?.length || 0} registered students.</p>
+              <p className="font-medium">Payment emails will be sent to all {institutionData.sportTeams 
+                ? institutionData.sportTeams.reduce((total: number, team: any) => total + team.students.length, 0)
+                : institutionData.students?.length || 0
+              } registered students.</p>
               <p className="text-sm text-muted-foreground">
                 Each email will include: Student details, fee breakdown, and secure payment link.
               </p>

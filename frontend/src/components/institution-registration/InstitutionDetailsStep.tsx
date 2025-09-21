@@ -170,6 +170,27 @@ export const InstitutionDetailsStep = ({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
+              <Label htmlFor="institutionType">Institute Type *</Label>
+              <Select 
+                value={formData.institutionType} 
+                onValueChange={(value) => {
+                  handleInputChange("institutionType", value);
+                  // Reset institution name when type changes
+                  handleInputChange("institutionName", "");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select institute type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INSTITUTE_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="institutionName">Institute Name *</Label>
               {formData.institutionType === "Other" ? (
                 <Input
@@ -194,27 +215,6 @@ export const InstitutionDetailsStep = ({
                   </SelectContent>
                 </Select>
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="institutionType">Institute Type *</Label>
-              <Select 
-                value={formData.institutionType} 
-                onValueChange={(value) => {
-                  handleInputChange("institutionType", value);
-                  // Reset institution name when type changes
-                  handleInputChange("institutionName", "");
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select institute type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INSTITUTE_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
