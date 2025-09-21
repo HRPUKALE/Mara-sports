@@ -349,6 +349,62 @@ class ApiService {
   async getStudentSports(studentId: string) {
     return this.request(`/students/${studentId}/sports`);
   }
+
+  // Institution Sports Management APIs
+  async getInstitutionSports() {
+    return this.request('/institution/sports');
+  }
+
+  async getInstitutionStudents() {
+    return this.request('/institution/students');
+  }
+
+  async updateSport(sportId: string, data: any) {
+    return this.request(`/sports/${sportId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async addSportCategory(sportId: string, data: any) {
+    return this.request(`/sports/${sportId}/categories`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async addSportSubCategory(categoryId: string, data: any) {
+    return this.request(`/categories/${categoryId}/subcategories`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteSportCategory(categoryId: string) {
+    return this.request(`/categories/${categoryId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async deleteSportSubCategory(subCategoryId: string) {
+    return this.request(`/subcategories/${subCategoryId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async assignStudentsToSport(sportId: string, data: any) {
+    return this.request(`/sports/${sportId}/assign-students`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async assignStudentSports(studentId: string, data: any) {
+    return this.request(`/students/${studentId}/sports`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 // Create and export a singleton instance

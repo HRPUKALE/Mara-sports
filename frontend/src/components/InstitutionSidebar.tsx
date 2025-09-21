@@ -21,6 +21,7 @@ import {
 const menuItems = [
   { title: "Dashboard", url: "/institution", icon: LayoutDashboard },
   { title: "Student Management", url: "/institution/students", icon: Users },
+  { title: "Sports Management", url: "/institution/sports", icon: Trophy },
   { title: "Payment Options", url: "/institution/payments", icon: CreditCard },
 ];
 
@@ -34,7 +35,7 @@ export function InstitutionSidebar() {
       : "hover:bg-muted/50";
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">

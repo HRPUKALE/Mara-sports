@@ -24,6 +24,7 @@ import InstitutionRegisterPage from "./pages/institution/InstitutionRegisterPage
 import { NewInstitutionRegisterPage } from "./pages/NewInstitutionRegisterPage";
 import InstitutionDashboard from "./pages/institution/InstitutionDashboard";
 import InstitutionStudentManagement from "./pages/institution/InstitutionStudentManagement";
+import InstitutionSportsManagement from "./pages/institution/InstitutionSportsManagement";
 import InstitutionPayments from "./pages/institution/InstitutionPayments";
 
 // Admin Panel
@@ -118,6 +119,7 @@ const App = () => (
             <Route path="/institution" element={<InstitutionLayout />}>
               <Route index element={<InstitutionDashboard />} />
               <Route path="students" element={<InstitutionStudentManagement />} />
+              <Route path="sports" element={<InstitutionSportsManagement />} />
               <Route path="payments" element={<InstitutionPayments />} />
             </Route>
 

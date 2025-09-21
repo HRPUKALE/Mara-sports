@@ -20,7 +20,8 @@ import {
   Clock,
   XCircle,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  ArrowRight
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
@@ -152,7 +153,7 @@ const InstitutionDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Students</CardTitle>
@@ -194,6 +195,66 @@ const InstitutionDashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">₹{stats.totalAmount}</div>
             <p className="text-xs text-muted-foreground">All registrations</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/institution/students'}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              Student Management
+            </CardTitle>
+            <CardDescription>
+              Manage student registrations and view their details
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-blue-600">{stats.totalStudents}</div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">Total registered students</p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/institution/sports'}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-green-600" />
+              Sports Management
+            </CardTitle>
+            <CardDescription>
+              View and manage sports with enrolled students
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-green-600">0</div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">Sports enrolled</p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/institution/payments'}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-purple-600" />
+              Payment Management
+            </CardTitle>
+            <CardDescription>
+              Track payments and financial transactions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-purple-600">₹{stats.totalAmount}</div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">Total amount collected</p>
           </CardContent>
         </Card>
       </div>

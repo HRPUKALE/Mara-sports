@@ -6,6 +6,7 @@ import { EmailOtpStep } from "@/components/registration/EmailOtpStep";
 import { InstitutionDetailsStep } from "@/components/institution-registration/InstitutionDetailsStep";
 import { SportsSubCategoriesStep } from "@/components/institution-registration/SportsSubCategoriesStep";
 import { ManualStudentAddStep } from "@/components/institution-registration/ManualStudentAddStep";
+import { EnhancedManualStudentAddStep } from "@/components/institution-registration/EnhancedManualStudentAddStep";
 import { InstitutionPaymentStep } from "@/components/institution-registration/InstitutionPaymentStep";
 import { InstitutionRegistrationSidebar } from "@/components/registration/InstitutionRegistrationSidebar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -175,7 +176,7 @@ export const NewInstitutionRegisterPage = () => {
           )}
           
           {currentStep === 3 && (
-            <ManualStudentAddStep
+            <EnhancedManualStudentAddStep
               initialData={registrationData.students}
               onComplete={(data) => handleStepComplete(3, data)}
               onBack={() => handleBack(3)}
