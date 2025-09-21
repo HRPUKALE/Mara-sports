@@ -168,7 +168,6 @@ class ApiService {
   async getSubCategories(categoryId: string) {
     return this.request(`/categories/${categoryId}/subcategories`);
   }
-
   // Registration APIs
   async createRegistration(registrationData: any) {
     return this.request('/registrations', {
@@ -357,13 +356,6 @@ class ApiService {
 
   async getInstitutionStudents() {
     return this.request('/institution/students');
-  }
-
-  async updateSport(sportId: string, data: any) {
-    return this.request(`/sports/${sportId}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
   }
 
   async addSportCategory(sportId: string, data: any) {

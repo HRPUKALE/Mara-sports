@@ -400,6 +400,7 @@ async def get_student(
         created_at=student.created_at,
         updated_at=student.updated_at,
     )
+<<<<<<< HEAD
 
 
 @router.put("/{student_id}", response_model=StudentResponse)
@@ -456,3 +457,5 @@ async def update_student(
         created_at=updated_student.created_at,
         updated_at=updated_student.updated_at,
     )
+=======
+>>>>>>> 47379439 (improved the admin panel more to go)

@@ -222,25 +222,32 @@ const RegisterPage = () => {
         if (!formData.parentEmail) stepErrors.push("Parent/Guardian Email is required");
         break;
       case 4:
+        if (!formData.streetAddress) stepErrors.push("Street Address is required");
+        if (!formData.city) stepErrors.push("City is required");
+        if (!formData.state) stepErrors.push("State is required");
+        if (!formData.country) stepErrors.push("Country is required");
+        if (!formData.postalCode) stepErrors.push("Postal Code is required");
+        break;
+      case 5:
         if (!formData.emergencyContactName) stepErrors.push("Emergency Contact Name is required");
         if (!formData.emergencyContactRelation) stepErrors.push("Relationship is required");
         if (!formData.emergencyContactPhone) stepErrors.push("Emergency Contact Phone is required");
         break;
-      case 5:
+      case 6:
         if (!formData.medicalQuestion1) stepErrors.push("Medical Question 1 is required");
         if (!formData.medicalQuestion2) stepErrors.push("Medical Question 2 is required");
         break;
-      case 6:
+      case 7:
         if (!formData.participationType) stepErrors.push("Participation Type is required");
         if (formData.selectedSports.length === 0) stepErrors.push("At least one sport must be selected");
         break;
-      case 7:
+      case 8:
         if (!agreements.waiver) stepErrors.push("Waiver agreement is required");
         break;
-      case 8:
+      case 9:
         if (!agreements.privacy) stepErrors.push("Privacy policy agreement is required");
         break;
-      case 9:
+      case 10:
         if (!agreements.declaration) stepErrors.push("Declaration agreement is required");
         break;
     }
@@ -382,7 +389,7 @@ const RegisterPage = () => {
       // Register student with backend
       const response = await apiService.registerStudent(studentData);
       
-      if (response.success) {
+      if (response.status === 200 || response.status === 201) {
         toast({
           title: "🎉 Registration Complete!",
           description: "Your account has been created successfully. Please log in to access your dashboard.",
@@ -804,43 +811,7 @@ const RegisterPage = () => {
           </div>
         );
 
-      case 3:
-        return (
-          <div className="space-y-4">
-            <div className="relative">
-              <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Parent/Guardian Full Name *"
-                value={formData.parentGuardianName}
-                onChange={(e) => handleInputChange("parentGuardianName", e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Parent/Guardian Phone Number *"
-                value={formData.parentPhone}
-                onChange={(e) => handleInputChange("parentPhone", e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="email"
-                placeholder="Parent/Guardian Email Address *"
-                value={formData.parentEmail}
-                onChange={(e) => handleInputChange("parentEmail", e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-        );
-
-      case 4:
+      case 5:
         return (
           <div className="space-y-4">
             <div className="relative">
@@ -890,7 +861,7 @@ const RegisterPage = () => {
           </div>
         );
 
-      case 5:
+      case 6:
         return (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -937,7 +908,7 @@ const RegisterPage = () => {
           </div>
         );
 
-      case 6:
+      case 7:
         return (
           <div className="space-y-6">
             <div className="space-y-4">
@@ -1017,7 +988,7 @@ const RegisterPage = () => {
           </div>
         );
 
-      case 7:
+      case 8:
         return (
           <div className="space-y-4">
             <div className="max-h-60 overflow-y-auto p-4 border rounded-lg bg-muted/50">
@@ -1048,7 +1019,7 @@ const RegisterPage = () => {
           </div>
         );
 
-      case 8:
+      case 9:
         return (
           <div className="space-y-4">
             <div className="max-h-60 overflow-y-auto p-4 border rounded-lg bg-muted/50">
@@ -1082,7 +1053,7 @@ const RegisterPage = () => {
           </div>
         );
 
-      case 9:
+      case 10:
         return (
           <div className="space-y-4">
             <div className="p-4 border rounded-lg bg-muted/50">

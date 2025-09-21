@@ -20,8 +20,12 @@ import {
   Clock,
   XCircle,
   Loader2,
+<<<<<<< HEAD
   AlertCircle,
   ArrowRight
+=======
+  AlertCircle
+>>>>>>> 47379439 (improved the admin panel more to go)
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiService } from "@/services/api";
@@ -153,7 +157,11 @@ const InstitutionDashboard = () => {
       </div>
 
       {/* Stats Cards */}
+<<<<<<< HEAD
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+=======
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+>>>>>>> 47379439 (improved the admin panel more to go)
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Students</CardTitle>
@@ -199,6 +207,7 @@ const InstitutionDashboard = () => {
         </Card>
       </div>
 
+<<<<<<< HEAD
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/institution/students'}>
@@ -259,6 +268,8 @@ const InstitutionDashboard = () => {
         </Card>
       </div>
 
+=======
+>>>>>>> 47379439 (improved the admin panel more to go)
       {/* Search and Filters */}
       <Card className="shadow-soft">
         <CardContent className="p-4">

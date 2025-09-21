@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+<<<<<<< HEAD
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { InstitutionSidebar } from "@/components/InstitutionSidebar";
 import { InstitutionHeader } from "@/components/InstitutionHeader";
@@ -16,6 +17,23 @@ const InstitutionLayout = () => {
             <Outlet />
           </main>
         </SidebarInset>
+=======
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { InstitutionSidebar } from "@/components/InstitutionSidebar";
+import { InstitutionHeader } from "@/components/InstitutionHeader";
+
+const InstitutionLayout = () => {
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <InstitutionSidebar />
+        <div className="flex-1 flex flex-col">
+          <InstitutionHeader />
+          <main className="flex-1 p-6">
+            <Outlet />
+          </main>
+        </div>
+>>>>>>> 47379439 (improved the admin panel more to go)
       </div>
     </SidebarProvider>
   );

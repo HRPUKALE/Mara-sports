@@ -182,7 +182,6 @@ const AdminStudents = () => {
     }
   };
 
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -333,7 +332,7 @@ const AdminStudents = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/admin/students/edit/${student.id}`)}
+                        onClick={() => handleEditStudent(student)}
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
@@ -452,116 +451,116 @@ const AdminStudents = () => {
             </TabsList>
             
             <TabsContent value="details" className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label>First Name</Label>
-                <Input value={addForm.first_name} onChange={(e) => setAddForm({ ...addForm, first_name: e.target.value })} />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>First Name</Label>
+                  <Input value={addForm.first_name} onChange={(e) => setAddForm({ ...addForm, first_name: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Middle Name</Label>
+                  <Input value={addForm.middle_name} onChange={(e) => setAddForm({ ...addForm, middle_name: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Last Name</Label>
+                  <Input value={addForm.last_name} onChange={(e) => setAddForm({ ...addForm, last_name: e.target.value })} />
+                </div>
               </div>
-              <div>
-                <Label>Middle Name</Label>
-                <Input value={addForm.middle_name} onChange={(e) => setAddForm({ ...addForm, middle_name: e.target.value })} />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>Email</Label>
+                  <Input type="email" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Student ID</Label>
+                  <Input value={addForm.student_id} onChange={(e) => setAddForm({ ...addForm, student_id: e.target.value })} />
+                </div>
+                <div />
               </div>
-              <div>
-                <Label>Last Name</Label>
-                <Input value={addForm.last_name} onChange={(e) => setAddForm({ ...addForm, last_name: e.target.value })} />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label>Email</Label>
-                <Input type="email" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
-              </div>
-              <div>
-                <Label>Student ID</Label>
-                <Input value={addForm.student_id} onChange={(e) => setAddForm({ ...addForm, student_id: e.target.value })} />
-              </div>
-              <div />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label>Institute Type</Label>
-                <Select value={addForm.institution_type} onValueChange={(v) => setAddForm({ ...addForm, institution_type: v, institution_name: "" })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Kaiso School">Kaiso School</SelectItem>
-                    <SelectItem value="Goverment School">Goverment School</SelectItem>
-                    <SelectItem value="Academics">Academics</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Institute Name</Label>
-                {addForm.institution_type === "Other" ? (
-                  <Input value={addForm.institution_name} onChange={(e) => setAddForm({ ...addForm, institution_name: e.target.value })} />
-                ) : (
-                  <Select value={addForm.institution_name} onValueChange={(v) => setAddForm({ ...addForm, institution_name: v })}>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>Institute Type</Label>
+                  <Select value={addForm.institution_type} onValueChange={(v) => setAddForm({ ...addForm, institution_type: v, institution_name: "" })}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select name" />
+                      <SelectValue placeholder="Select type" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-72">
-                      {(addForm.institution_type === "Kaiso School" ? [
-                        "Aga Khan Academy",
-                        "Braeburn Garden Estate - BGE",
-                        "Braeburn Gitanga Road - BGR",
-                        "Braeside School, Thika",
-                        "Braeside School, Lavington",
-                        "Brookhouse School, Karen",
-                        "Brookhouse School, Runda",
-                        "Brookhurst International, Lavington",
-                        "Brookhurst International, Kiserian",
-                        "Crawford International School",
-                        "The Banda School",
-                        "French School",
-                        "German School",
-                        "Jawabu School",
-                        "Light International School",
-                        "Makini Cambridge School",
-                        "Nairobi Academy",
-                        "Nairobi Jaffery Academy",
-                        "Oshwal Academy U15 & U17",
-                        "Oshwal Academy U17 & U19",
-                        "Peponi School (overall)",
-                        "Peponi School (Girls Sport)",
-                        "Peponi School (Boys Sport)",
-                        "Rosslyn Academy (overall)",
-                        "Kenton College",
-                        "Rusinga School",
-                        "SABIS International School",
-                        "St Austin's Academy",
-                        "St. Christopher's School",
-                        "Swedish School",
-                        "Woodcreek School",
-                        "West Nairobi School - WNS",
-                        "ISK",
-                        "Durham International School - DIS",
-                      ] : addForm.institution_type === "Goverment School" ? [
-                        "MBAGATHI ROAD PRIMARY",
-                        "NEMBU PRIMARY",
-                        "KAWANGWARE PRIMARY",
-                        "TOI PRIMARY",
-                        "RIRUTA HGM PRIMARY",
-                      ] : addForm.institution_type === "Academics" ? [
-                        "Talanta",
-                        "JB Academy",
-                        "Muqs",
-                        "Bumble Bee Sports",
-                        "Discovery Tennis",
-                        "TY SPORTS",
-                        "Terriffic Tennis",
-                        "TY SPORTS",
-                        "Next Gen Multi Sport Academu",
-                      ] : []).map((n) => (
-                        <SelectItem key={n} value={n}>{n}</SelectItem>
-                      ))}
+                    <SelectContent>
+                      <SelectItem value="Kaiso School">Kaiso School</SelectItem>
+                      <SelectItem value="Goverment School">Goverment School</SelectItem>
+                      <SelectItem value="Academics">Academics</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                )}
+                </div>
+                <div>
+                  <Label>Institute Name</Label>
+                  {addForm.institution_type === "Other" ? (
+                    <Input value={addForm.institution_name} onChange={(e) => setAddForm({ ...addForm, institution_name: e.target.value })} />
+                  ) : (
+                    <Select value={addForm.institution_name} onValueChange={(v) => setAddForm({ ...addForm, institution_name: v })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select name" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {(addForm.institution_type === "Kaiso School" ? [
+                          "Aga Khan Academy",
+                          "Braeburn Garden Estate - BGE",
+                          "Braeburn Gitanga Road - BGR",
+                          "Braeside School, Thika",
+                          "Braeside School, Lavington",
+                          "Brookhouse School, Karen",
+                          "Brookhouse School, Runda",
+                          "Brookhurst International, Lavington",
+                          "Brookhurst International, Kiserian",
+                          "Crawford International School",
+                          "The Banda School",
+                          "French School",
+                          "German School",
+                          "Jawabu School",
+                          "Light International School",
+                          "Makini Cambridge School",
+                          "Nairobi Academy",
+                          "Nairobi Jaffery Academy",
+                          "Oshwal Academy U15 & U17",
+                          "Oshwal Academy U17 & U19",
+                          "Peponi School (overall)",
+                          "Peponi School (Girls Sport)",
+                          "Peponi School (Boys Sport)",
+                          "Rosslyn Academy (overall)",
+                          "Kenton College",
+                          "Rusinga School",
+                          "SABIS International School",
+                          "St Austin's Academy",
+                          "St. Christopher's School",
+                          "Swedish School",
+                          "Woodcreek School",
+                          "West Nairobi School - WNS",
+                          "ISK",
+                          "Durham International School - DIS",
+                        ] : addForm.institution_type === "Goverment School" ? [
+                          "MBAGATHI ROAD PRIMARY",
+                          "NEMBU PRIMARY",
+                          "KAWANGWARE PRIMARY",
+                          "TOI PRIMARY",
+                          "RIRUTA HGM PRIMARY",
+                        ] : addForm.institution_type === "Academics" ? [
+                          "Talanta",
+                          "JB Academy",
+                          "Muqs",
+                          "Bumble Bee Sports",
+                          "Discovery Tennis",
+                          "TY SPORTS",
+                          "Terriffic Tennis",
+                          "TY SPORTS",
+                          "Next Gen Multi Sport Academu",
+                        ] : []).map((n) => (
+                          <SelectItem key={n} value={n}>{n}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                <div />
               </div>
-              <div />
-            </div>
             </TabsContent>
             
             <TabsContent value="sports" className="space-y-4">

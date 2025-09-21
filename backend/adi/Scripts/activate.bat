@@ -8,7 +8,11 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
+<<<<<<< HEAD
 set VIRTUAL_ENV=C:\Users\aditya thorat\Downloads\Mara-sports-main\Mara-sports-main\Mara-sports\backend\adi
+=======
+set VIRTUAL_ENV=C:\Users\aditya thorat\Downloads\Mara_sport\Mara-sports-main\backend\adi
+>>>>>>> 47379439 (improved the admin panel more to go)
 
 if not defined PROMPT set PROMPT=$P$G
 
